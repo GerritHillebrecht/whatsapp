@@ -116,8 +116,8 @@
             "prerender": false,
             "ssr": false,
             "browserTarget": "whatsapp:build:production",
-            "firebaseProject": "soundnite",
-            "firebaseHostingSite": "soundnite"
+            "firebaseProject": "whatsapp",
+            "firebaseHostingSite": "whatsapp"
           }
         }
       }

@@ -1,14 +1,5 @@
 {
-  "targets": {
-    "soundnite": {
-      "hosting": {
-        "whatsapp": [
-          "soundnite"
-        ]
-      }
-    }
-  },
   "projects": {
-    "default": "soundnite"
+    "default": "whatsapp-angular"
   }
 }

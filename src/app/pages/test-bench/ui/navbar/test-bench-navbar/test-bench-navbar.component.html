@@ -1,0 +1,7 @@
+<mat-toolbar class="bg-transparent">
+  <div class="ml-auto flex items-center">
+    <button mat-button *ngFor="let link of links" [routerLink]="link.path">
+      {{ link.label }}
+    </button>
+  </div>
+</mat-toolbar>

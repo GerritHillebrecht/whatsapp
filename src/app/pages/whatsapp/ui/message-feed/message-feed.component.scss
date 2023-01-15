@@ -1,0 +1,33 @@
+.whatsapp-background {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/assets/images/whatsapp-background.jpg");
+    background-position: top left;
+    background-size: auto;
+    background-repeat: repeat;
+
+    opacity: 0.1;
+  }
+}
+
+.scrollbar-custom {
+  scrollbar-gutter: stable;
+  // scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    // background-color: black;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #8d8d8d;
+    max-height: 50px;
+    border-radius: 20px;
+  }
+}

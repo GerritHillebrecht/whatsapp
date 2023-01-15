@@ -1,0 +1,13 @@
+<mat-icon
+  class="w-[min-content!important] h-[min-content!important] relative text-stone-600 -bottom-[1px]"
+  style="font-size: inherit; line-height: inherit;"
+  [ngSwitch]="status"
+  [ngClass]="{
+    'text-slate-600': status !== 'read',
+    'text-sky-500': status === 'read'
+  }"
+>
+  <ng-container *ngSwitchCase="'pending'">done</ng-container>
+  <ng-container *ngSwitchCase="'delivered'">done_all</ng-container>
+  <ng-container *ngSwitchCase="'read'">done_all</ng-container>
+</mat-icon>

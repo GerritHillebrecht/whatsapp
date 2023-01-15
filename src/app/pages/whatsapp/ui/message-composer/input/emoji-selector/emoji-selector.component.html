@@ -1,0 +1,21 @@
+<button mat-icon-button type="button" [mat-menu-trigger-for]="emojiSelector">
+  <mat-icon>insert_emoticon</mat-icon>
+</button>
+<mat-menu
+  #emojiSelector="matMenu"
+  class="p-2 relative overflow-x-auto scrollbar-custom scrollbar-hidden dark:bg-stone-800"
+  [overlapTrigger]="false"
+  yPosition="above"
+>
+  <div class="w-[2000px] p-8 bg-red-400"></div>
+</mat-menu>
+
+<!-- <div class="overflow-y-auto emoji-menu-panel relative h-[300px]">
+  <button
+    mat-icon-button
+    *ngFor="let emoji of emojis"
+    (click)="emojiClickHandler(emoji)"
+  >
+    {{ emoji }}
+  </button>
+</div> -->

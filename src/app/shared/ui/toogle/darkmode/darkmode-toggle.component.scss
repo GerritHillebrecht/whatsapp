@@ -1,0 +1,61 @@
+
+.mode {
+  --border-color: white;
+  --rotation: 0deg;
+  --animate-duration: 0.5s;
+
+  cursor: pointer;
+  position: relative;
+  width: 2.5rem;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  transition: all var(--animate-duration) ease;
+  transform: rotate(var(--rotation));
+
+  &.dark {
+    --border-color: black;
+    --rotation: 180deg;
+  }
+
+  &.animate {
+    &:after {
+      animation: scale var(--animate-duration) ease forwards;
+    }
+  }
+
+  &:after,
+  &:before {
+    content: "";
+    position: absolute;
+    inset: 16.5%;
+    border-radius: 50%;
+    transition: all var(--animate-duration) ease;
+    background-image: linear-gradient(
+      to right,
+      white 0%,
+      white 50%,
+      black 50%,
+      black 100%
+    );
+  }
+
+  &:before {
+    border: 2px solid var(--border-color);
+  }
+
+  &:after {
+    transform: scale(0.5) rotate(180deg);
+  }
+
+  @keyframes scale {
+    0% {
+      transform: scale(0.5) rotate(180deg);
+    }
+    50% {
+      transform: scale(0.7) rotate(180deg);
+    }
+    100% {
+      transform: scale(0.5) rotate(180deg);
+    }
+  }
+}

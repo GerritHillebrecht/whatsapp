@@ -1,0 +1,43 @@
+<form [formGroup]="form">
+  <mat-form-field class="w-full matInput-rounded-corners" floatLabel="always">
+    <mat-label>Suchen oder neuer Chat</mat-label>
+    <mat-icon matSuffix>search</mat-icon>
+    <input
+      type="text"
+      matInput
+      autofocus
+      placeholder="Kontakte durchsuchen"
+      aria-label="Number"
+      formControlName="search"
+      [matAutocomplete]="auto"
+    />
+    <mat-autocomplete
+      autoActiveFirstOption
+      #auto="matAutocomplete"
+      [displayWith]="displayFn"
+    >
+      <mat-optgroup
+        *ngFor="let result of searchResults$ | async"
+        [label]="result.contacts.length ? result.label : ''"
+      >
+        <mat-option
+          *ngFor="let contact of result.contacts"
+          [value]="contact"
+          (click)="handleSelection(contact)"
+        >
+          <div class="flex flex-row gap-2 items-center py-2">
+            <app-avatar
+              [imageSrc]="contact.image"
+              [initials]="contact.firstName[0] + contact.lastName[0]"
+              [size]="30"
+            ></app-avatar>
+            <div class="flex flex-col gap-0">
+              <span>{{ contact.firstName }} {{ contact.lastName }}</span>
+              <span class="text-xs italic">{{ contact.email }}</span>
+            </div>
+          </div>
+        </mat-option>
+      </mat-optgroup>
+    </mat-autocomplete>
+  </mat-form-field>
+</form>

@@ -1,0 +1,13 @@
+<div
+  class="grid grid-cols-[1fr] grid-rows-[1fr] h-screen overflow-hidden sm:grid-cols-[max-content_clamp(340px,_30%,_380px)_auto]"
+>
+  <ng-container *ngIf="!(screenSizeService.twSm$ | async); else mobile">
+    <app-user-sidebar></app-user-sidebar>
+    <app-contact-feed></app-contact-feed>
+    <app-message-feed></app-message-feed>
+  </ng-container>
+</div>
+
+<ng-template #mobile>
+  <app-contact-feed></app-contact-feed>
+</ng-template>

@@ -1,0 +1,19 @@
+<div
+  #messageRef
+  *ngIf="message"
+  class="slide-in flex flex-col max-w-[60%] w-[max-content] min-w-[15%] rounded-lg shadow-md p-2 text-stone-800"
+  [ngClass]="{
+    'ml-auto rounded-br-sm bg-green-200':
+      (user$ | async)?.id === message.sender.id,
+    'mr-auto rounded-bl-sm bg-gray-100':
+      (user$ | async)?.id === message.receiver.id
+  }"
+>
+  <span class="text-sm">{{ message.body }}</span>
+  <div class="flex flex-row text-[0.65rem] leading-none gap-1 text-right justify-end items-center">
+    <span class="opacity-60">{{ message.createdAt | date: 'shortTime'  }}</span>
+    <app-message-delivery-status
+      [status]="message.deliveryStatus"
+    ></app-message-delivery-status>
+  </div>
+</div>

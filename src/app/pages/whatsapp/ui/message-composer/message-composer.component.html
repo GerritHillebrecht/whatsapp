@@ -1,0 +1,28 @@
+<form
+  [formGroup]="compose.messageForm"
+  (submit)="sendMessage()"
+  class="grid grid-cols-[max-content,_auto,_max-content] gap-2 p-2 items-center border-t-2 border-solid border-stone-200 dark:border-stone-800"
+>
+  <!-- Emoji-Button -->
+  <app-emoji-selector
+    [inputComponent]="textArea"
+    [control]="compose.messageControl"
+  ></app-emoji-selector>
+
+  <!-- Text-Area -->
+  <app-textarea
+    #textArea
+    [form]="compose.messageForm"
+    [control]="compose.messageControl"
+  ></app-textarea>
+
+  <!-- Send-Button -->
+  <button
+    mat-icon-button
+    type="submit"
+    (click)="sendMessage()"
+    [disabled]="compose.messageForm.invalid"
+  >
+    <mat-icon>send</mat-icon>
+  </button>
+</form>

@@ -1,0 +1,25 @@
+<div
+  class="sm:pt-4 sm:px-4 relative z-20 h-screen bg-white overflow-y-hidden grid grid-rows-[max-content,_max-content,_auto] sm:grid-rows-[max-content,_max-content,_auto] dark:bg-stone-800 shadow-[0px_10px_8px_2px_rgba(0,_0,_0,_0.2)] transition-all duration-500"
+>
+  <div class="flex items-center w-full mb-2 px-4 pt-4 sm:pt-0 sm:px-0">
+    <span class="font-semibold inter text-xl">Chats</span>
+    <div class="ml-auto flex flex-row gap-0 items-center">
+      <button mat-icon-button>
+        <mat-icon>add_box</mat-icon>
+      </button>
+      <app-darkmode-toggle size="1.5rem"></app-darkmode-toggle>
+    </div>
+  </div>
+  <div class="px-4 sm:px-0">
+    <app-contact-search-bar></app-contact-search-bar>
+  </div>
+  <div
+    class="relative flex flex-col gap-[2px] overflow-y-auto scrollbar-custom sm:pr-4 sm:-mr-4 -mt-4 pt-2"
+  >
+    <app-contact
+      *ngFor="let contact of contacts$ | async"
+      [contact]="contact"
+      [active]="contact.id === (selectedContact$ | async)?.id"
+    ></app-contact>
+  </div>
+</div>

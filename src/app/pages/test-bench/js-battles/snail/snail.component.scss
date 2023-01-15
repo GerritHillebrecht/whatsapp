@@ -1,0 +1,15 @@
+.tile {
+  --transition-delay: 0ms;
+  --tile-color: white;
+
+  transition-duration: 100ms;
+  transition-timing-function: ease-in-out;
+  transition-delay: var(--transition-delay);
+  background-color: white;
+  opacity: 0;
+
+  &.active {
+    background-color: var(--tile-color);
+    opacity: 1;
+  }
+}

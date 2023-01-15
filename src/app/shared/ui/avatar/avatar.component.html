@@ -1,0 +1,23 @@
+<div
+  class="rounded-full relative"
+  [ngClass]="{ 'border-2 border-solid border-rose-400 p-[2px]': border }"
+  [ngStyle]="{ cursor }"
+>
+  <ng-container *ngIf="imageSrc; else initialCircle">
+    <img
+      [src]="imageSrc"
+      alt="Avatar Image"
+      [height]="size"
+      [width]="size"
+      class="rounded-full"
+    />
+  </ng-container>
+  <ng-template #initialCircle>
+    <div
+      class="rounded-full bg-rose-400 aspect-square grid place-items-center text-white font-bold text-sm"
+      [ngStyle]="{ width: size + 'px' }"
+    >
+      {{ initials }}
+    </div>
+  </ng-template>
+</div>

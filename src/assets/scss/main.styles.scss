@@ -1,0 +1,15 @@
+@import "./backgrounds.scss";
+
+@layer components {
+  .background-dark-color {
+    @apply dark:bg-black sm:dark:bg-stone-900;
+  }
+
+  .background-light-color {
+    @apply bg-white sm:bg-stone-100;
+  }
+
+  .main-background-color {
+    @apply background-dark-color background-light-color transition-all duration-500;
+  }
+}

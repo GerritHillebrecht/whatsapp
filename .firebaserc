@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "soundnite": {
+      "hosting": {
+        "whatsapp": [
+          "soundnite"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "soundnite"
+  }
+}

@@ -1,0 +1,12 @@
+<mat-toolbar class="bg-transparent max-w-7xl mx-auto" style="color: inherit">
+  <app-logo routerLink="/" class="cursor-pointer"></app-logo>
+  <div class="ml-auto flex items-center gap-4">
+    <button mat-button routerLink="/whatsapp">
+      <mat-icon class="relative top-[1px]">chat</mat-icon>
+      Whatsapp
+    </button>
+    <ng-container *ngIf="auth.user$ | async as user">
+      <app-profile-menu></app-profile-menu>
+    </ng-container>
+  </div>
+</mat-toolbar>

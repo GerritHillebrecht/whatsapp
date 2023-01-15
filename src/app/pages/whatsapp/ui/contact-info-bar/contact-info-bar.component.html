@@ -1,0 +1,33 @@
+<header
+  class="sm:py-2 py-2 after:bg-gradient-to-b after:transition-all after:duration-500 after:opacity-75 after:from-stone-100 after:dark:from-stone-900 after:to-transparent"
+>
+  <mat-toolbar class="bg-transparent text-inherit">
+    <div
+      class="flex flex-row items-center gap-2 sm:gap-3"
+      *ngIf="contact$ | async as contact"
+    >
+      <button
+        mat-icon-button
+        class="text-inherit"
+        routerLink="/whatsapp"
+        *ngIf="screenSize.twSm$ | async"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <app-avatar
+        [size]="40"
+        [imageSrc]="contact.image"
+        [initials]="contact.firstName[0] + contact.lastName[0]"
+      ></app-avatar>
+      <div class="flex flex-col">
+        <span class="text-sm font-bold">
+          {{ contact.firstName }} {{ contact.lastName }}
+        </span>
+        <span class="text-xs">
+          {{ contact.lastMessage?.updatedAt | date : "shortDate" }}
+        </span>
+      </div>
+    </div>
+  </mat-toolbar>
+</header>

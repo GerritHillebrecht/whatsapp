@@ -1,0 +1,18 @@
+@mixin dark-background {
+  @apply dark:bg-black sm:dark:bg-stone-900;
+}
+
+@mixin light-background {
+  @apply bg-white sm:bg-stone-100;
+}
+
+@mixin contrast-background {
+  @apply bg-black sm:bg-stone-900 dark:bg-white sm:dark:bg-stone-100;
+}
+
+@layer components {
+  .contrast-background {
+    @include contrast-background;
+    @apply transition-all duration-500;
+  }
+}

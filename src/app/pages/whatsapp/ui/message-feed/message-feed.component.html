@@ -1,0 +1,38 @@
+<!-- Wrapper -->
+<div
+  *ngIf="messages$"
+  #wrapper
+  class="h-screen grid grid-rows-[max-content,_auto,_max-content]"
+>
+  <!-- Contact Info Bar -->
+  <app-contact-info-bar></app-contact-info-bar>
+
+  <!-- Message Feed -->
+  <!-- Scroll-wrapper -->
+  <div #scroller class="overflow-y-scroll scrollbar-custom">
+    <!-- Wrapper for background -->
+    <div
+      class="whatsapp-background dark:before:invert relative min-h-full flex flex-row"
+    >
+      <!-- Container for Messages, max-sized, reversed -->
+      <div
+        #messageContainer
+        *ngIf="messages$ | async as messages; else selectContact"
+        class="relative z-10 max-w-[min(100%,_1280px)] min-h-full w-full mx-auto flex flex-end gap-2 flex-col-reverse py-2 sm:py-2 px-2 sm:px-4"
+      >
+        <!-- Message Component -->
+        <app-message
+          [message]="message"
+          *ngFor="let message of messages; trackBy: trackByMessageFn"
+        ></app-message>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Composer -->
+  <app-message-composer></app-message-composer>
+</div>
+
+<ng-template #selectContact>
+  <div class="m-auto">Select Chat!</div>
+</ng-template>

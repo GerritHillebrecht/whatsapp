@@ -1,0 +1,19 @@
+.scrollbar-custom {
+  scrollbar-gutter: stable;
+  // scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    // background-color: black;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #8d8d8d;
+    max-height: 50px;
+    border-radius: 20px;
+  }
+}

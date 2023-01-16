@@ -1,4 +1,13 @@
 {
+  "targets": {
+    "whatsapp-angular": {
+      "hosting": {
+        "whatsapp-angular": [
+          "whatsapp-angular"
+        ]
+      }
+    }
+  },
   "projects": {
     "default": "whatsapp-angular"
   }

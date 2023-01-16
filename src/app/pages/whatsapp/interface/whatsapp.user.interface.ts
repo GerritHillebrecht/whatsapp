@@ -7,6 +7,7 @@ export interface WhatsappUser {
   firstName: string;
   lastName: string;
   image?: string | null;
+  isBot: boolean;
 
   contacts: WhatsappUser[];
 
@@ -19,6 +20,7 @@ export const UserFragment = gql`
     id
     firstName
     lastName
+    isBot
     email
     image
     createdAt

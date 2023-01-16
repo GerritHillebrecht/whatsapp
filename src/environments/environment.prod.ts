@@ -14,6 +14,6 @@ export const environment = {
       http: 'https',
       ws: 'wss',
     },
-    uri: 'soundnite.up.railway.app',
+    uri: 'whatsapp-nestjs.up.railway.app',
   },
 };

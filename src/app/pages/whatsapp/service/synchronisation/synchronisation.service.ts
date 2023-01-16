@@ -4,7 +4,7 @@ import { AuthenticationStateModel as ASM } from '@auth/store';
 import { Store } from '@ngxs/store';
 import { WhatsappStateModel as WSM } from '@whatsapp/store';
 import { Apollo } from 'apollo-angular';
-import { filter, Observable } from 'rxjs';
+import { filter, Observable, tap } from 'rxjs';
 import { map } from 'rxjs';
 import {
   WhatsappContact,
@@ -57,6 +57,7 @@ export class SynchronisationService {
     return this.apollo
       .subscribe<SubQueryResult, SubQueryVariables>(subQueryOptions)
       .pipe(
+        tap((result) => console.log({ RESULTOFSUB: result })),
         filter(({ data }) => Boolean(data)),
         map(({ data }) => this.addMessageToContact(data!.messageSubscription))
       );
@@ -110,11 +111,16 @@ export class SynchronisationService {
     contact: WhatsappContact,
     message: WhatsappMessage
   ): WhatsappContact {
+    const { selectedContact }: WSM = this.store.snapshot().whatsapp;
+    const updateCount = Number(
+      selectedContact?.id !== contact.id || !message.isMine
+    );
+
     return {
       ...contact,
       lastMessage: message,
       messages: [message, ...contact.messages],
-      unreadMessages: contact.unreadMessages + 1,
+      unreadMessages: contact.unreadMessages + updateCount,
     };
   }
 

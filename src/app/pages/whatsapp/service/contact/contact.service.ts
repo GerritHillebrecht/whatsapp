@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { WhatsappUser } from '@whatsapp/interface';
+import { UserFragment, WhatsappUser } from '@whatsapp/interface';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 
@@ -8,15 +8,11 @@ interface SearchArgs {
 }
 
 const SEARCH_USER_QUERY = gql`
+  ${UserFragment}
+
   query SearchContacts($searchString: String!) {
     searchContacts(searchString: $searchString) {
-      id
-      firstName
-      lastName
-      email
-      image
-      createdAt
-      updatedAt
+      ...UserFragment
     }
   }
 `;

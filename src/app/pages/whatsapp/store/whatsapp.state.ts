@@ -41,6 +41,7 @@ export class WhatsappState implements NgxsOnInit {
 
   ngxsOnInit({ dispatch }: StateContext<WhatsappStateModel>) {
     dispatch(new SyncWithServer());
+    dispatch(new SubscribeToMessages());
   }
 
   @Action(SyncWithServer)

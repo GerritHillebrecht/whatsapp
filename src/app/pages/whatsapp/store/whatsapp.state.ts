@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, NgxsOnInit, Selector } from '@ngxs/store';
+import {
+  State,
+  Action,
+  StateContext,
+  NgxsOnInit,
+  Selector,
+  Store,
+} from '@ngxs/store';
 import { AuthenticationService } from '@auth/service';
-import { firstValueFrom } from 'rxjs';
 import { WhatsappMessage, WhatsappContact } from '../interface';
 import { SynchronisationService } from '../service';
 import {
@@ -10,6 +16,8 @@ import {
   SyncWithServer,
   UpdateContacts,
 } from './whatsapp.actions';
+import { AuthenticationStateModel as ASM } from '@auth/store';
+import { filter } from 'rxjs';
 
 export interface WhatsappStateModel {
   selectedContact: WhatsappContact | null;
@@ -36,28 +44,39 @@ export class WhatsappState implements NgxsOnInit {
 
   constructor(
     private auth: AuthenticationService,
+    private store: Store,
     private syncService: SynchronisationService
   ) {}
 
   ngxsOnInit({ dispatch }: StateContext<WhatsappStateModel>) {
-    dispatch(new SyncWithServer());
-    dispatch(new SubscribeToMessages());
+    this.store
+      .select(
+        ({ authentication }: { authentication: ASM }) => authentication.user
+      )
+      .pipe(filter((user) => Boolean(user)))
+      .subscribe((user) => {
+        dispatch(new SyncWithServer(user!.id));
+        dispatch(new SubscribeToMessages(user!.id));
+      });
   }
 
   @Action(SyncWithServer)
-  async sync({ dispatch }: StateContext<WhatsappStateModel>) {
-    const currentUser = await firstValueFrom(this.auth.user$);
-    if (!currentUser) return;
-
-    this.syncService.syncDataWithServer(currentUser.id).subscribe({
+  async sync(
+    { dispatch }: StateContext<WhatsappStateModel>,
+    { id }: SyncWithServer
+  ) {
+    this.syncService.syncDataWithServer(id).subscribe({
       next: (contacts) => dispatch(new UpdateContacts(contacts)),
       error: (err) => console.error(err),
     });
   }
 
   @Action(SubscribeToMessages)
-  subscribeToMessages({ dispatch }: StateContext<WhatsappStateModel>) {
-    this.syncService.messageSubscription().subscribe({
+  subscribeToMessages(
+    { dispatch }: StateContext<WhatsappStateModel>,
+    { id }: SubscribeToMessages
+  ) {
+    this.syncService.messageSubscription(id).subscribe({
       next: (contacts) => dispatch(new UpdateContacts(contacts)),
       error: (err) => console.error(err),
     });

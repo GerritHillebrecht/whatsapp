@@ -4,7 +4,7 @@ import { AuthenticationStateModel as ASM } from '@auth/store';
 import { Store } from '@ngxs/store';
 import { WhatsappStateModel as WSM } from '@whatsapp/store';
 import { Apollo } from 'apollo-angular';
-import { filter, Observable, tap } from 'rxjs';
+import { filter, Observable, takeUntil, tap } from 'rxjs';
 import { map } from 'rxjs';
 import {
   WhatsappContact,
@@ -38,6 +38,9 @@ export class SynchronisationService {
     return this.apollo
       .watchQuery<SyncQueryResult, SyncQueryVariables>(syncQueryOptions)
       .valueChanges.pipe(
+        takeUntil(
+          this.store.select(({ authentication }) => authentication.user)
+        ),
         filter((result) => Boolean(result.data)),
         map(({ data: { messages, contacts } }) => {
           // this.markMessagesAsRead(messages);
@@ -46,7 +49,9 @@ export class SynchronisationService {
       );
   }
 
-  messageSubscription(): Observable<WhatsappContact[]> {
+  messageSubscription(id: number): Observable<WhatsappContact[]> {
+    console.log('SUBSCRIPTION STARTED');
+    console.log({ store: this.store.snapshot().authentication });
     const subQueryOptions = {
       query: SUBSCRIPTION_QUERY,
       variables: {
@@ -57,20 +62,24 @@ export class SynchronisationService {
     return this.apollo
       .subscribe<SubQueryResult, SubQueryVariables>(subQueryOptions)
       .pipe(
-        tap((result) => console.log({ RESULTOFSUB: result })),
+        takeUntil(
+          this.store.select(({ authentication }) => authentication.user)
+        ),
         filter(({ data }) => Boolean(data)),
-        map(({ data }) => this.addMessageToContact(data!.messageSubscription))
+        map(({ data }) =>
+          this.addMessageToContact(data!.messageSubscription, id)
+        )
       );
   }
 
   private addMessageToContact(
-    msgData: WhatsappMessageQueryDto
+    msgData: WhatsappMessageQueryDto,
+    id: number
   ): WhatsappContact[] {
     const { contacts }: WSM = this.store.snapshot().whatsapp;
-    const { user }: ASM = this.store.snapshot().authentication;
     const { sender, receiver } = msgData;
 
-    const isMine = sender.id === user?.id;
+    const isMine = sender.id === id;
     const message: WhatsappMessage = { ...msgData, isMine };
 
     const contact =

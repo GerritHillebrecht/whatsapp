@@ -1,7 +1,7 @@
 <div
   *ngIf="contact"
   (click)="clickHandler()"
-  class="flex px-4 py-2 sm:px-3 gap-4 sm:gap-3 inter hover:bg-stone-100 hover:dark:bg-stone-700 cursor-pointer transition-all duration-500 sm:rounded-lg"
+  class="flex px-6 py-2 sm:py-3 sm:px-4 gap-4 sm:gap-3 inter hover:bg-stone-100 hover:dark:bg-stone-700 cursor-pointer sm:rounded-lg"
   [ngClass]="{ 'bg-stone-100 dark:bg-stone-700': active }"
 >
   <!-- Col 1, Avatar -->
@@ -9,12 +9,12 @@
     <app-avatar
       [imageSrc]="contact.image"
       [initials]="contact.firstName[0] + contact.lastName[0]"
-      [size]="(screenSize.twSm$ | async) ? 56 : 40"
+      [size]="(screenSize.twSm$ | async) ? 56 : 46"
     ></app-avatar>
   </div>
 
   <!-- Col 2, Name & Message Body -->
-  <div class="flex flex-col grow justify-center">
+  <div class="flex flex-col gap-[4px] grow justify-center">
     <!-- row 1, contact name -->
     <div class="flex flex-row justify-between items-center">
       <span
@@ -32,7 +32,7 @@
       </span>
     </div>
     <!-- row 2, message preview body -->
-    <span class="line-clamp text-sm sm:text-xs opacity-80 min-h-[2rem]">
+    <span class="line-clamp text-sm sm:text-xs opacity-80">
       {{ contact.lastMessage?.body || "Schreibe eine Nachricht" }}
     </span>
   </div>

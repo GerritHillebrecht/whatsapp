@@ -78,7 +78,11 @@ export class ContactSearchBarComponent implements OnInit {
       switchMap((input) =>
         combineLatest([
           this.store
-            .select(({ whatsapp }: { whatsapp: WSM }) => whatsapp.contacts)
+            .select(({ whatsapp }: { whatsapp: WSM }) =>
+              whatsapp.contacts.filter((contact) =>
+                Boolean(contact.lastMessage)
+              )
+            )
             .pipe(map((contacts) => this.filterContacts(contacts))),
           this.contact.searchUser({ searchString: input }),
         ]).pipe(
@@ -116,7 +120,7 @@ export class ContactSearchBarComponent implements OnInit {
         .toLowerCase()
         .trim()
         .replaceAll(' ', '');
-      const search = this.searchControl.value
+      const search = (this.searchControl.value || '')
         .toLowerCase()
         .trim()
         .replaceAll(' ', '');

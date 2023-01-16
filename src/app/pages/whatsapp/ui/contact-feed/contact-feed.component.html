@@ -1,30 +1,45 @@
-<div
-  class="sm:pt-4 sm:px-4 relative z-20 h-screen bg-white overflow-y-hidden grid grid-rows-[max-content,_max-content,_auto] sm:grid-rows-[max-content,_max-content,_auto] dark:bg-stone-800 shadow-[0px_10px_8px_2px_rgba(0,_0,_0,_0.2)] transition-all duration-500"
+<aside
+  class="relative h-screen z-20 bg-white dark:bg-stone-800 shadow-lg grid grid-rows-[max-content,_auto]"
 >
-  <div class="flex items-center w-full mb-2 px-4 pt-4 sm:pt-0 sm:px-0">
-    <span class="font-semibold inter text-xl">Chats</span>
-    <div class="ml-auto flex flex-row gap-0 items-center">
-      <button mat-icon-button>
-        <mat-icon>add_box</mat-icon>
-      </button>
-      <app-darkmode-toggle size="1.5rem"></app-darkmode-toggle>
-    </div>
-  </div>
-  <div class="px-4 sm:px-0">
+  <!-- Header Part with Title & Search-Bar -->
+  <header class="flex flex-col gap-2 pt-8 px-6 -mb-5">
+    <!-- Header part -->
+    <nav class="flex flex-row justify-between items-center">
+      <!-- Headline -->
+      <span class="font-semibold inter text-xl">Chats</span>
+
+      <!-- Buttons -->
+      <div class="flex flex-row gap-2">
+        <button mat-icon-button>
+          <mat-icon>add_box</mat-icon>
+        </button>
+        <app-darkmode-toggle
+          size="1.5rem"
+          *ngIf="screenSizeService.twSm$ | async"
+        ></app-darkmode-toggle>
+      </div>
+      <!-- END buttons -->
+    </nav>
+
+    <!-- Search Bar -->
     <app-contact-search-bar></app-contact-search-bar>
-  </div>
+  </header>
+
+  <!-- Contacts iteration -->
   <div
     *ngIf="contacts$ | async as contacts"
-    class="relative flex flex-col gap-[2px] overflow-y-auto scrollbar-custom sm:pr-4 sm:-mr-4 -mt-4 pt-2"
+    class="flex flex-col px-2 py-4 gap-3 overflow-y-auto scrollbar-custom"
   >
+    <!-- Contact iterator -->
     <app-contact
       *ngFor="let contact of contacts"
       [contact]="contact"
       [active]="contact.id === (selectedContact$ | async)?.id"
     ></app-contact>
 
+    <!-- Helper Message for new Users -->
     <ng-container *ngIf="contacts.length <= 1">
-      <div class="h-full flex flex-col items-center pt-[30%]">
+      <div class="h-full flex flex-col items-center pt-12">
         <div
           class="flex flex-col gap-2 max-w-[70%] w-full text-xl inter text-center items-center"
         >
@@ -42,4 +57,4 @@
       </div>
     </ng-container>
   </div>
-</div>
+</aside>

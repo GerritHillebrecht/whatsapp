@@ -25,9 +25,6 @@ import { ScreenSizeService } from '@core/services/screen-size';
   styleUrls: ['./message-feed.component.scss'],
 })
 export class MessageFeedComponent implements AfterViewInit {
-  @ViewChild('wrapper')
-  wrapper: ElementRef<HTMLDivElement> | undefined;
-
   @ViewChild('scroller')
   scroller: ElementRef<HTMLDivElement> | undefined;
 
@@ -40,7 +37,6 @@ export class MessageFeedComponent implements AfterViewInit {
   constructor(protected screenSizeService: ScreenSizeService) {}
 
   ngAfterViewInit() {
-    // this.setMainHeight();
     this.scrollToBottom();
   }
 
@@ -62,15 +58,4 @@ export class MessageFeedComponent implements AfterViewInit {
     });
     resizeObserver.observe(this.messageContainer!.nativeElement);
   }
-
-  // private setMainHeight() {
-  //   const header = document.querySelector('.main-header');
-  //   const resizeOberserver = this.resizeOberserver(() => {
-  //     this.wrapper!.nativeElement.style.height = `calc(100vh - ${
-  //       header?.clientHeight || 0
-  //     }px)`;
-  //   });
-
-  //   resizeOberserver.observe(header!);
-  // }
 }

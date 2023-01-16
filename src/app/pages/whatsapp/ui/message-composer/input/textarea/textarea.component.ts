@@ -1,5 +1,12 @@
-import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  Component,
+  OnDestroy,
+  Input,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -8,7 +15,7 @@ import {
   Subject,
   switchMap,
   takeUntil,
-  tap,
+  Observable,
 } from 'rxjs';
 import {
   FormControl,
@@ -16,11 +23,11 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Input } from '@angular/core';
-import { AfterViewInit } from '@angular/core';
-import { ViewChild } from '@angular/core';
-import { ElementRef } from '@angular/core';
+import { Select } from '@ngxs/store';
+
 import { MessageComposeService, MessageService } from '@whatsapp/service';
+import { WhatsappContact } from '@whatsapp/interface';
+import { WhatsappStateModel as WSM } from '@whatsapp/store';
 
 @Component({
   selector: 'app-textarea',
@@ -30,30 +37,40 @@ import { MessageComposeService, MessageService } from '@whatsapp/service';
   styleUrls: ['./textarea.component.scss'],
 })
 export class TextareaComponent implements OnDestroy, AfterViewInit {
+  @ViewChild('textArea')
+  elementRef: ElementRef<HTMLInputElement> | undefined;
+
+  @Select(({ whatsapp }: { whatsapp: WSM }) => whatsapp.selectedContact)
+  selectedContact$: Observable<WhatsappContact[]> | undefined;
+
   @Input()
   form: FormGroup | undefined;
 
   @Input()
   control: FormControl | undefined;
 
-  @ViewChild('textArea')
-  elementRef: ElementRef<HTMLInputElement> | undefined;
-
   destroy$ = new Subject<void>();
 
-  constructor(
-    private compose: MessageComposeService,
-    private message: MessageService
-  ) {}
+  constructor(private message: MessageService) {}
 
   ngAfterViewInit(): void {
     const { nativeElement } = this.elementRef!;
+
+    // Register the resizeTextarea and registerKeydownEvent methods
     try {
       this.resizeTextarea(nativeElement, this.control!);
       this.registerKeydownEvent(nativeElement, this.form!);
     } catch (e) {
       console.error(e);
     }
+
+    // Focus Chat Input after selecting a contact
+    this.selectedContact$?.subscribe(() => nativeElement.focus());
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
@@ -71,7 +88,7 @@ export class TextareaComponent implements OnDestroy, AfterViewInit {
         const scrollHeight = element.scrollHeight;
         // Set the height of the textarea to the calculated height
         element.style.height =
-          value?.length > 0 ? `calc(${scrollHeight}px + 2px)` : `auto`;
+          value?.length > 0 ? `calc(${scrollHeight}px + 4px)` : `auto`;
       });
   }
 
@@ -95,10 +112,5 @@ export class TextareaComponent implements OnDestroy, AfterViewInit {
           console.error(err);
         },
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

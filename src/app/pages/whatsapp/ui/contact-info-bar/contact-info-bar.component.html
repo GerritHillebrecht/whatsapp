@@ -1,5 +1,5 @@
 <header
-  class="sm:py-2 py-2 after:bg-gradient-to-b after:transition-all after:duration-500 after:opacity-75 after:from-stone-100 after:dark:from-stone-900 after:to-transparent"
+  class="sm:py-2 py-2 sm:px-4 after:bg-gradient-to-b after:opacity-75 after:from-stone-100 after:dark:from-stone-900 after:to-transparent"
 >
   <mat-toolbar class="bg-transparent text-inherit">
     <div
@@ -16,7 +16,7 @@
       </button>
 
       <app-avatar
-        [size]="40"
+        [size]="46"
         [imageSrc]="contact.image"
         [initials]="contact.firstName[0] + contact.lastName[0]"
       ></app-avatar>
@@ -25,7 +25,11 @@
           {{ contact.firstName }} {{ contact.lastName }}
         </span>
         <span class="text-xs">
-          {{ contact.lastMessage?.updatedAt | date : "shortDate" }}
+          {{
+            contact.isBot
+              ? "online"
+              : (contact.lastMessage?.updatedAt | date : "shortDate")
+          }}
         </span>
       </div>
     </div>

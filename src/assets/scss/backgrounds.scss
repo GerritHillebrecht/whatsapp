@@ -13,6 +13,5 @@
 @layer components {
   .contrast-background {
     @include contrast-background;
-    @apply transition-all duration-500;
   }
 }

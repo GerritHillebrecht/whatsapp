@@ -4,7 +4,7 @@ import { ContactComponent } from '../contact/contact.component';
 import { Select } from '@ngxs/store';
 import { WhatsappStateModel as WSM } from '@pages/whatsapp/store';
 import { Observable } from 'rxjs';
-import { WhatsappContact } from '@pages/whatsapp/interface';
+import { WhatsappContact, WhatsappUser } from '@pages/whatsapp/interface';
 import { ContactSearchBarComponent } from '../contact-search-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,7 +22,7 @@ import { LogoComponent } from '@shared/ui/logo';
     MatIconModule,
     MatButtonModule,
     DarkmodeToggleComponent,
-    LogoComponent
+    LogoComponent,
   ],
   templateUrl: './contact-feed.component.html',
   styleUrls: ['./contact-feed.component.scss'],
@@ -30,7 +30,7 @@ import { LogoComponent } from '@shared/ui/logo';
 export class ContactFeedComponent {
   @Select(({ whatsapp }: { whatsapp: WSM }) =>
     whatsapp.contacts
-      .filter((contact) => contact.lastMessage)
+      .filter((contact) => contact.lastMessage || contact.isBot)
       .sort((a, b) => {
         return (
           new Date(b.lastMessage?.createdAt || new Date()).getTime() -

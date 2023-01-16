@@ -9,6 +9,23 @@ export const MARK_MESSAGES_AS_READ_MUTATION = gql`
   }
 `;
 
+export const SUBSCRIPTION_QUERY = gql`
+  ${MessageFragment}
+  ${UserFragment}
+
+  subscription MessageSubscription($id: Float!) {
+    messageSubscription(receiverId: $id) {
+      ...MessageFragment
+      sender {
+        ...UserFragment
+      }
+      receiver {
+        ...UserFragment
+      }
+    }
+  }
+`;
+
 export const SYNCHRONIZATION_QUERY = gql`
   ${UserFragment}
   ${MessageFragment}
@@ -37,5 +54,14 @@ export interface SyncQueryResult {
 }
 
 export interface SyncQueryVariables {
+  id: number;
+}
+
+export interface SubQueryResult {
+  __typename: string;
+  messageSubscription: WhatsappMessageQueryDto;
+}
+
+export interface SubQueryVariables {
   id: number;
 }

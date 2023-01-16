@@ -6,6 +6,7 @@ import { WhatsappMessage, WhatsappContact } from '../interface';
 import { SynchronisationService } from '../service';
 import {
   SelectContact,
+  SubscribeToMessages,
   SyncWithServer,
   UpdateContacts,
 } from './whatsapp.actions';
@@ -48,6 +49,14 @@ export class WhatsappState implements NgxsOnInit {
     if (!currentUser) return;
 
     this.syncService.syncDataWithServer(currentUser.id).subscribe({
+      next: (contacts) => dispatch(new UpdateContacts(contacts)),
+      error: (err) => console.error(err),
+    });
+  }
+
+  @Action(SubscribeToMessages)
+  subscribeToMessages({ dispatch }: StateContext<WhatsappStateModel>) {
+    this.syncService.messageSubscription().subscribe({
       next: (contacts) => dispatch(new UpdateContacts(contacts)),
       error: (err) => console.error(err),
     });

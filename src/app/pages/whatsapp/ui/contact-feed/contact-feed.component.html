@@ -14,12 +14,32 @@
     <app-contact-search-bar></app-contact-search-bar>
   </div>
   <div
+    *ngIf="contacts$ | async as contacts"
     class="relative flex flex-col gap-[2px] overflow-y-auto scrollbar-custom sm:pr-4 sm:-mr-4 -mt-4 pt-2"
   >
     <app-contact
-      *ngFor="let contact of contacts$ | async"
+      *ngFor="let contact of contacts"
       [contact]="contact"
       [active]="contact.id === (selectedContact$ | async)?.id"
     ></app-contact>
+
+    <ng-container *ngIf="contacts.length <= 1">
+      <div class="h-full flex flex-col items-center pt-[30%]">
+        <div
+          class="flex flex-col gap-2 max-w-[70%] w-full text-xl inter text-center items-center"
+        >
+          <app-logo [showText]="false" size="3x"></app-logo>
+          <span> Du hast noch keinen Chat? </span>
+          <strong>Kein Problem.</strong>
+          <span>
+            Durchsuche einfach über die Suchleiste deine Kontakte oder füge
+            einen neuen Kontakt hinzu.
+          </span>
+          <span class="italic text-sm">
+            Der OPEN AI Bot steht dir immer zur Verfügung.
+          </span>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </div>

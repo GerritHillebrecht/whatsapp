@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { WatchQueryFetchPolicy } from '@apollo/client/core';
+import { AuthenticationStateModel as ASM } from '@auth/store';
 import { Store } from '@ngxs/store';
+import { WhatsappStateModel as WSM } from '@whatsapp/store';
 import { Apollo } from 'apollo-angular';
-import { Observable } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 import { map } from 'rxjs';
 import {
   WhatsappContact,
@@ -12,6 +14,9 @@ import {
 } from '../../interface';
 import {
   MARK_MESSAGES_AS_READ_MUTATION,
+  SubQueryResult,
+  SubQueryVariables,
+  SUBSCRIPTION_QUERY,
   SYNCHRONIZATION_QUERY,
   SyncQueryResult,
   SyncQueryVariables,
@@ -33,11 +38,56 @@ export class SynchronisationService {
     return this.apollo
       .watchQuery<SyncQueryResult, SyncQueryVariables>(syncQueryOptions)
       .valueChanges.pipe(
+        filter((result) => Boolean(result.data)),
         map(({ data: { messages, contacts } }) => {
           // this.markMessagesAsRead(messages);
           return this.mapMessagesToContacts(messages, contacts);
         })
       );
+  }
+
+  messageSubscription(): Observable<WhatsappContact[]> {
+    const subQueryOptions = {
+      query: SUBSCRIPTION_QUERY,
+      variables: {
+        id: this.store.snapshot().authentication.user.id,
+      },
+    };
+
+    return this.apollo
+      .subscribe<SubQueryResult, SubQueryVariables>(subQueryOptions)
+      .pipe(
+        filter(({ data }) => Boolean(data)),
+        map(({ data }) => this.addMessageToContact(data!.messageSubscription))
+      );
+  }
+
+  private addMessageToContact(
+    msgData: WhatsappMessageQueryDto
+  ): WhatsappContact[] {
+    const { contacts }: WSM = this.store.snapshot().whatsapp;
+    const { user }: ASM = this.store.snapshot().authentication;
+    const { sender, receiver } = msgData;
+
+    const isMine = sender.id === user?.id;
+    const message: WhatsappMessage = { ...msgData, isMine };
+
+    const contact =
+      contacts.find((c) => c.id === (isMine ? receiver.id : sender.id)) ||
+      this.temporaryNewContact(sender, message);
+
+    const updatedContact = this.updateContact(contact, message);
+
+    return contacts
+      .filter((c) => c.id !== updatedContact.id)
+      .concat([updatedContact])
+      .sort((a, b) => {
+        if (!a.lastMessage || !b.lastMessage) return -1;
+        return (
+          new Date(b.lastMessage.createdAt).getTime() -
+          new Date(a.lastMessage.createdAt).getTime()
+        );
+      });
   }
 
   private markMessagesAsRead(messages: WhatsappMessageQueryDto[]) {
@@ -54,6 +104,30 @@ export class SynchronisationService {
     //   mutation: MARK_MESSAGES_AS_READ_MUTATION,
     //   variables: { messageIds: unreadMessages },
     // });
+  }
+
+  private updateContact(
+    contact: WhatsappContact,
+    message: WhatsappMessage
+  ): WhatsappContact {
+    return {
+      ...contact,
+      lastMessage: message,
+      messages: [message, ...contact.messages],
+      unreadMessages: contact.unreadMessages + 1,
+    };
+  }
+
+  private temporaryNewContact(
+    user: WhatsappUser,
+    message: WhatsappMessage
+  ): WhatsappContact {
+    return {
+      ...user,
+      lastMessage: null,
+      messages: [],
+      unreadMessages: 0,
+    };
   }
 
   private mapMessagesToContacts(

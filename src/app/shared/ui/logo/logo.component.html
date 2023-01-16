@@ -6,6 +6,6 @@
   class="opacity-70 brightness-0 dark:invert transition-all duration-500 ease"
 /> -->
 <div class="flex flex-row gap-2 items-center">
-  <fa-icon [size]="size" [icon]="logo"></fa-icon>
-  <span style="font-family: 'Noto Serif Toto', serif">Whatsapp</span>
+  <fa-icon *ngIf="showIcon" [size]="size" [icon]="logo"></fa-icon>
+  <span *ngIf="showText" style="font-family: 'Noto Serif Toto', serif">Whatsapp</span>
 </div>

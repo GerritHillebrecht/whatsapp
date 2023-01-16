@@ -14,3 +14,8 @@ export class UpdateContacts {
   static readonly type = '[Whatsapp] Update contacts';
   constructor(public contacts: WhatsappContact[]) {}
 }
+
+export class SubscribeToMessages {
+  static readonly type = '[Whatsapp] Subscribe to messages';
+  constructor() {}
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
@@ -12,6 +12,14 @@ import { SizeProp } from '@fortawesome/fontawesome-svg-core';
   styleUrls: ['./logo.component.scss'],
 })
 export class LogoComponent {
-  logo = faWhatsapp;
+  @Input()
+  showText = true;
+
+  @Input()
+  showIcon = true;
+
+  @Input()
   size: SizeProp = 'xl';
+
+  logo = faWhatsapp;
 }

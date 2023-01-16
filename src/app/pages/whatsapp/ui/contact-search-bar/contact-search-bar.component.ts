@@ -20,11 +20,14 @@ import {
   startWith,
   switchMap,
   Observable,
+  firstValueFrom,
 } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { AvatarComponent } from '@shared/ui/avatar';
 import { Store } from '@ngxs/store';
 import { WhatsappStateModel as WSM, SelectContact } from '@whatsapp/store';
+import { ScreenSizeService } from '@core/services/screen-size';
+import { Router } from '@angular/router';
 
 type SearchResults =
   | Observable<{ label: string; contacts: WhatsappUser[] }[]>
@@ -56,7 +59,12 @@ export class ContactSearchBarComponent implements OnInit {
 
   searchResults$: SearchResults;
 
-  constructor(private contact: ContactService, private store: Store) {
+  constructor(
+    private contact: ContactService,
+    private store: Store,
+    private screenSize: ScreenSizeService,
+    private router: Router
+  ) {
     this.form = new FormGroup({
       search: new FormControl(''),
     });
@@ -86,13 +94,16 @@ export class ContactSearchBarComponent implements OnInit {
     );
   }
 
-  protected handleSelection(user: WhatsappUser) {
+  protected async handleSelection(user: WhatsappUser) {
     const { whatsapp }: { whatsapp: WSM } = this.store.snapshot();
     const contact = whatsapp.contacts.find((contact) => contact.id === user.id);
 
     if (!contact) return;
     this.searchControl.reset();
     this.store.dispatch(new SelectContact(contact));
+    if (await firstValueFrom(this.screenSize.twSm$)) {
+      this.router.navigate(['whatsapp', 'chat']);
+    }
   }
 
   protected displayFn(user: WhatsappUser) {

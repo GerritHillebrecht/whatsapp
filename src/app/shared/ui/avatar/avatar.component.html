@@ -9,7 +9,8 @@
       alt="Avatar Image"
       [height]="size"
       [width]="size"
-      class="rounded-full"
+      class="rounded-full object-cover"
+      [ngStyle]="{ width: size + 'px', height: size + 'px' }"
     />
   </ng-container>
   <ng-template #initialCircle>

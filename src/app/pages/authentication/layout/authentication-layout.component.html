@@ -1,3 +1,98 @@
-<div class="grid place-items-center relative h-full">
-  <button mat-flat-button color="warn" (click)="googleLogin()">Google</button>
+<div class="flex justify-center items-center w-full h-full">
+  <div
+    [formGroup]="form"
+    class="flex flex-col gap-8 max-w-sm w-full px-4 sm:px-0 items-center"
+  >
+    <app-logo [showText]="false" size="5x"></app-logo>
+    <div class="flex flex-row gap-6 w-full justify-center">
+      <button
+        mat-mini-fab
+        type="button"
+        color="warn"
+        (click)="googleLogin()"
+        matTooltip="Mit Google anmelden"
+      >
+        <fa-icon [icon]="google"></fa-icon>
+      </button>
+      <button
+        mat-mini-fab
+        type="button"
+        color="primary"
+        matTooltip="Facebook coming soon"
+      >
+        <fa-icon [icon]="facebook"></fa-icon>
+      </button>
+      <button mat-mini-fab type="button" matTooltip="GitHub coming soon">
+        <fa-icon [icon]="github"></fa-icon>
+      </button>
+    </div>
+    <div class="w-full">
+      <mat-tab-group>
+        <mat-tab label="Einfach testen">
+          <div class="flex flex-col gap-4 py-4">
+            <div
+              *ngFor="let user of testUsers"
+              (click)="testUserClickHandler(user)"
+              [matTooltip]="'Als ' + user.displayName + ' anmelden'"
+              matTooltipPosition="above"
+              class="flex flex-row gap-4 cursor-pointer items-center px-4 py-3 rounded-lg hover:bg-stone-200 hover:dark:bg-stone-800"
+            >
+              <app-avatar [imageSrc]="user.image" [size]="60"></app-avatar>
+              <div class="flex flex-col gap-1 grow">
+                <span class="text-lg">{{ user.displayName }}</span>
+                <span class="text-sm text-gray-500">{{ user.email }}</span>
+              </div>
+              <mat-icon>arrow_forward_ios</mat-icon>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="E-Mail Anmeldung" class="h-[500px]">
+          <form [formGroup]="form" class="flex flex-col gap-2 w-full py-4">
+            <mat-form-field floatLabel="always" class="w-full">
+              <mat-label>E-Mail</mat-label>
+              <input
+                matInput
+                placeholder="max.mustermann@email.de"
+                formControlName="email"
+                type="email"
+                autocomplete="email"
+                autofocus
+              />
+            </mat-form-field>
+            <mat-form-field floatLabel="always">
+              <mat-label>Password</mat-label>
+              <input
+                #password
+                matInput
+                placeholder="Dein Passwort"
+                value="abc123"
+                formControlName="password"
+                autocomplete="current-password"
+                type="password"
+              />
+              <mat-icon
+                matSuffix
+                class="cursor-pointer"
+                (click)="
+                  password.type = password.type === 'text' ? 'password' : 'text'
+                "
+              >
+                {{
+                  password.type === "password" ? "visibility" : "visibility_off"
+                }}
+              </mat-icon>
+            </mat-form-field>
+            <button
+              mat-flat-button
+              color="primary"
+              type="submit"
+              [disabled]="form.invalid"
+            >
+              Login
+            </button>
+          </form>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
 </div>

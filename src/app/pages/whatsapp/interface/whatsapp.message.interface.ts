@@ -1,5 +1,5 @@
 import { gql } from 'apollo-angular';
-import { UserFragment, WhatsappUser } from './whatsapp.user.interface';
+import { WhatsappUser } from './whatsapp.user.interface';
 
 export interface WhatsappMessageQueryDto {
   __typename?: 'Message';

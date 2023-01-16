@@ -1,15 +1,12 @@
-import { gql } from "apollo-angular";
+import { gql } from 'apollo-angular';
+import { UserFragment } from '@whatsapp/interface';
 
 export const userQuery = gql`
+  ${UserFragment}
+
   query User($id: String!) {
     user(id: $id) {
-      id
-      firstName
-      lastName
-      email
-      image
-      createdAt
-      updatedAt
+      ...UserFragment
     }
   }
 `;

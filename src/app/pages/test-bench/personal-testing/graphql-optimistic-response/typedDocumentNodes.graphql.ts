@@ -1,61 +1,34 @@
 import { WhatsappMessageQueryDto } from '@whatsapp/interface';
+import { MessageFragment, UserFragment } from '@whatsapp/interface';
 import { gql } from 'apollo-angular';
 
 export const MESSAGE_QUERY = gql`
   query Messages($id: Float!) {
     messages(id: $id) {
-      id
-      body
-      isRead
-      deliveryStatus
+      ...MessageFragment
       sender {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
       receiver {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
-      createdAt
-      updatedAt
     }
   }
 `;
 
 export const MESSAGE_CREATE_MUTATION = gql`
+  ${UserFragment}
+  ${MessageFragment}
+
   mutation SaveMessage($body: String!, $receiverId: Float!, $senderId: Float!) {
     saveMessage(body: $body, receiverId: $receiverId, senderId: $senderId) {
-      id
-      body
-      isRead
-      image
-      deliveryStatus
+      ...MessageFragment
       sender {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
       receiver {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -63,27 +36,13 @@ export const MESSAGE_CREATE_MUTATION = gql`
 export const MESSAGE_UPDATE_MUTATION = gql`
   mutation UpdateMessage($id: Float!, $body: String!) {
     updateMessage(id: $id, body: $body) {
-      id
-      body
-      isRead
+      ...MessageFragment
       sender {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
       receiver {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -91,27 +50,13 @@ export const MESSAGE_UPDATE_MUTATION = gql`
 export const MESSAGE_DELETE_MUTATION = gql`
   mutation DeleteMessage($id: Float!) {
     deleteMessage(id: $id) {
-      id
-      body
-      isRead
+      ...MessageFragment
       sender {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
       receiver {
-        id
-        firstName
-        lastName
-        email
-        createdAt
-        updatedAt
+        ...UserFragment
       }
-      createdAt
-      updatedAt
     }
   }
 `;

@@ -116,8 +116,8 @@
             "prerender": false,
             "ssr": false,
             "browserTarget": "whatsapp:build:production",
-            "firebaseProject": "whatsapp",
-            "firebaseHostingSite": "whatsapp"
+            "firebaseProject": "whatsapp-angular",
+            "firebaseHostingSite": "whatsapp-angular"
           }
         }
       }

@@ -8,7 +8,7 @@ import {
   Store,
   createSelector,
 } from '@ngxs/store';
-import { WhatsappMessage, WhatsappContact, WhatsappUser } from '../interface';
+import { WhatsappMessage, WhatsappContact } from '../interface';
 import { MessageService, SynchronisationService } from '../service';
 import {
   AddMessage,
@@ -25,13 +25,8 @@ import {
   AuthenticationState,
   AuthenticationStateModel as ASM,
 } from '@auth/store';
-import {
-  distinctUntilChanged,
-  distinctUntilKeyChanged,
-  filter,
-  map,
-  tap,
-} from 'rxjs';
+import { filter } from 'rxjs';
+import { MessageSubscriptionService } from '@whatsapp/service/subscription/message/message-subscription.service';
 
 export interface WhatsappStateModel {
   selectedContact: WhatsappContact | null;
@@ -84,6 +79,7 @@ export class WhatsappState implements NgxsOnInit {
   constructor(
     private store: Store,
     private messageService: MessageService,
+    private messageSubscriptService: MessageSubscriptionService,
     private syncService: SynchronisationService
   ) {}
 
@@ -120,7 +116,7 @@ export class WhatsappState implements NgxsOnInit {
     { dispatch }: StateContext<WhatsappStateModel>,
     { id }: SubscribeToMessages
   ) {
-    this.syncService.messageSubscription(id).subscribe({
+    this.messageSubscriptService.messageSubscription(id).subscribe({
       next: ({ contacts, message }) => {
         dispatch(new AddMessage(message));
         dispatch(new UpdateContacts(contacts));
@@ -195,9 +191,9 @@ export class WhatsappState implements NgxsOnInit {
   @Action(UpdateReadStatus)
   updateReadStatus(
     { patchState, getState }: StateContext<WhatsappStateModel>,
-    { messages }: UpdateReadStatus
+    { messageIds }: UpdateReadStatus
   ) {
-    this.messageService.updateReadStatus(messages.map((m) => m.id)).subscribe({
+    this.messageService.updateReadStatus(messageIds).subscribe({
       next: (updatedMessages) => {
         console.log('updated messages', updatedMessages);
       },

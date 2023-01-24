@@ -17,17 +17,13 @@ import {
 
 import uniqid from 'uniqid';
 
-import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/de';
-import dayjs from 'dayjs';
 import {
   ReadStatusUpdateResult,
   ReadStatusUpdateVariables,
   READ_STATUS_UPDATE_MUTATION,
 } from './message.graphql';
 
-dayjs.extend(relativeTime);
-dayjs.locale('de');
+
 
 @Injectable({
   providedIn: 'root',
@@ -127,7 +123,5 @@ export class MessageService {
       .pipe(map(({ data }) => data?.updateReadStatus));
   }
 
-  fromNow(date: Date) {
-    return dayjs(date).fromNow();
-  }
+
 }

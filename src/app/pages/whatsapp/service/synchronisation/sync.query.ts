@@ -9,7 +9,7 @@ export const MARK_MESSAGES_AS_READ_MUTATION = gql`
   }
 `;
 
-export const SUBSCRIPTION_QUERY = gql`
+export const MESSAGE_SUBSCRIPTION = gql`
   ${MessageFragment}
   ${UserFragment}
 

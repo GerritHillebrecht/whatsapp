@@ -37,7 +37,7 @@ export class AddMessage {
 
 export class UpdateReadStatus {
   static readonly type = '[Whatsapp] Update read status';
-  constructor(public messages: WhatsappMessage[]) {}
+  constructor(public messageIds: number[]) {}
 }
 
 export class UpdateContacts {

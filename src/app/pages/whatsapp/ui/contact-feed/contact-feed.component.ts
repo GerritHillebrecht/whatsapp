@@ -2,7 +2,10 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContactComponent } from '../contact/contact.component';
 import { Select } from '@ngxs/store';
-import { WhatsappStateModel as WSM } from '@pages/whatsapp/store';
+import {
+  WhatsappState,
+  WhatsappStateModel as WSM,
+} from '@pages/whatsapp/store';
 import { Observable } from 'rxjs';
 import { WhatsappContact, WhatsappUser } from '@pages/whatsapp/interface';
 import { ContactSearchBarComponent } from '../contact-search-bar';
@@ -28,6 +31,9 @@ import { LogoComponent } from '@shared/ui/logo';
   styleUrls: ['./contact-feed.component.scss'],
 })
 export class ContactFeedComponent {
+  @Select(WhatsappState.syncLoading)
+  syncLoading$: Observable<boolean> | undefined;
+
   @Select(({ whatsapp }: { whatsapp: WSM }) =>
     whatsapp.contacts
       .filter((contact) => contact.lastMessage || contact.isBot)
@@ -44,4 +50,14 @@ export class ContactFeedComponent {
   selectedContact$: Observable<WhatsappContact> | undefined;
 
   constructor(protected screenSizeService: ScreenSizeService) {}
+
+  ngOnInit() {
+    this.syncLoading$?.subscribe((loading) => {
+      console.log('syncLoading', loading);
+    });
+  }
+
+  trackByContactFn(index: number, contact: WhatsappContact): number {
+    return contact.id;
+  }
 }

@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/de';
-import dayjs from 'dayjs';
-
 import { Apollo } from 'apollo-angular';
-import { map, Observable } from 'rxjs';
+import { map, Observable, take } from 'rxjs';
 import { WhatsappMessage } from '@whatsapp/interface';
 import { MessageComposeService } from '../message-compose/message-compose.service';
 import { Store } from '@ngxs/store';
@@ -18,7 +14,17 @@ import {
   MessageCreateVariables,
   MESSAGE_CREATE_MUTATION,
 } from '@pages/test-bench/personal-testing/graphql-optimistic-response/typedDocumentNodes.graphql';
-import { take } from 'rxjs';
+
+import uniqid from 'uniqid';
+
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/de';
+import dayjs from 'dayjs';
+import {
+  ReadStatusUpdateResult,
+  ReadStatusUpdateVariables,
+  READ_STATUS_UPDATE_MUTATION,
+} from './message.graphql';
 
 dayjs.extend(relativeTime);
 dayjs.locale('de');
@@ -38,9 +44,10 @@ export class MessageService {
     this.compose.messageControl.reset();
     const [receiver, sender] = this.store.selectSnapshot((state) => [
       state.whatsapp.selectedContact,
-      state.authentication.user,
+      state.authentication.whatsappUser,
     ]);
     const variables = {
+      uuid: uniqid(),
       body,
       receiverId: receiver.id,
       senderId: sender.id,
@@ -55,6 +62,7 @@ export class MessageService {
           saveMessage: {
             __typename: 'Message',
             id: 0,
+            uuid: variables.uuid,
             body,
             image: '',
             isRead: false,
@@ -75,7 +83,7 @@ export class MessageService {
           const cachedData = cache.readQuery<SyncQueryResult, { id: number }>({
             query: SYNCHRONIZATION_QUERY,
             variables: {
-              id: this.store.snapshot().authentication.user.id,
+              id: this.store.snapshot().authentication.whatsappUser.id,
             },
           });
 
@@ -87,7 +95,7 @@ export class MessageService {
 
           const message = {
             ...saveMessage,
-            sender: this.store.snapshot().authentication.user,
+            sender: this.store.snapshot().authentication.whatsappUser,
             receiver: this.store.snapshot().whatsapp.selectedContact,
           };
 
@@ -108,6 +116,15 @@ export class MessageService {
         map((result: any) => result.data.sendMessage),
         take(1)
       );
+  }
+
+  updateReadStatus(messageIds: number[]) {
+    return this.apollo
+      .mutate<ReadStatusUpdateResult, ReadStatusUpdateVariables>({
+        mutation: READ_STATUS_UPDATE_MUTATION,
+        variables: { ids: messageIds },
+      })
+      .pipe(map(({ data }) => data?.updateReadStatus));
   }
 
   fromNow(date: Date) {

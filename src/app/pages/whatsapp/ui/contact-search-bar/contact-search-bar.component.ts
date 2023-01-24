@@ -102,6 +102,8 @@ export class ContactSearchBarComponent implements OnInit {
     const { whatsapp }: { whatsapp: WSM } = this.store.snapshot();
     const contact = whatsapp.contacts.find((contact) => contact.id === user.id);
 
+    console.log('contact', contact);
+
     if (!contact) return;
     this.searchControl.reset();
     this.store.dispatch(new SelectContact(contact));

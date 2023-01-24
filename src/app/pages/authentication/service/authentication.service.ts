@@ -9,13 +9,14 @@ import {
   GoogleAuthProvider,
 } from '@angular/fire/auth';
 import { Router } from '@angular/router';
+import { FirebaseUser } from '@auth/interface';
 import { SetAuthenticatedUser } from '@auth/store/authentication.actions';
 import { Store } from '@ngxs/store';
 import { WhatsappUser } from '@pages/whatsapp/interface';
 import { Apollo } from 'apollo-angular';
 import { tap } from 'rxjs';
 import { of } from 'rxjs';
-import { BehaviorSubject, catchError, map } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { shareReplay } from 'rxjs';
 import { switchMap } from 'rxjs';
 import { Observable } from 'rxjs';
@@ -36,7 +37,7 @@ export class AuthenticationService {
   ) {
     this.user$ = user(auth).pipe(
       tap(() => this.fetchingAuthState$.next(true)),
-      switchMap((user) => (user ? this.getUser(user) : of(null))),
+      switchMap((user) => (user ? this.getUserData(user) : of(null))),
       tap((user) => {
         this.store.dispatch(new SetAuthenticatedUser(user));
         this.fetchingAuthState$.next(false);
@@ -58,14 +59,14 @@ export class AuthenticationService {
     return this.router.navigate(['/']);
   }
 
-  private getUser(user: User | null): Observable<WhatsappUser | null> {
+  getUserData(user: FirebaseUser): Observable<WhatsappUser | null> {
     return this.apollo
-      .query<{ user: WhatsappUser }>({
+      .query<{ user: WhatsappUser }, { id: string }>({
         query: userQuery,
         variables: {
           id: user?.uid,
         },
       })
-      .pipe(map((result) => result?.data?.user || null));
+      .pipe(map(({ data }) => data?.user || null));
   }
 }

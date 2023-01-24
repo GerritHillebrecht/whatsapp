@@ -4,11 +4,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-import { DarkmodeToggleComponent } from '@shared/ui/toogle/darkmode';
 import { LogoComponent } from '@shared/ui/logo';
 import { RouterModule } from '@angular/router';
 import { AuthenticationService } from '@pages/authentication/service/authentication.service';
 import { ProfileMenuComponent } from '../profile-menu';
+import { Select } from '@ngxs/store';
+import { AuthenticationState } from '@auth/store';
+import { Observable } from 'rxjs';
+import { WhatsappUser } from '@whatsapp/interface';
 
 @Component({
   selector: 'app-main-toolbar',
@@ -26,5 +29,6 @@ import { ProfileMenuComponent } from '../profile-menu';
   styleUrls: ['./main-toolbar.component.scss'],
 })
 export class MainToolbarComponent {
-  constructor(protected auth: AuthenticationService) {}
+  @Select(AuthenticationState.user)
+  user$: Observable<WhatsappUser> | undefined;
 }

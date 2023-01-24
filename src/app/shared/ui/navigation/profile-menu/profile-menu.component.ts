@@ -5,11 +5,12 @@ import { WhatsappUser } from '@pages/whatsapp/interface';
 import { AvatarComponent } from '@shared/ui/avatar/avatar.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthenticationService } from '@pages/authentication/service/authentication.service';
 import { DarkmodeToggleComponent } from '@shared/ui/toogle/darkmode';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDividerModule } from '@angular/material/divider';
+import { Logout } from '@auth/store/authentication.actions';
 
 @Component({
   selector: 'app-profile-menu',
@@ -21,13 +22,18 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatMenuModule,
     MatIconModule,
     MatTooltipModule,
+    MatDividerModule,
   ],
   templateUrl: './profile-menu.component.html',
   styleUrls: ['./profile-menu.component.scss'],
 })
 export class ProfileMenuComponent {
-  @Select((state: any) => state.authentication.user)
-  user$!: Observable<WhatsappUser>;
+  @Select((state: any) => state.authentication.whatsappUser)
+  whatsappUser$!: Observable<WhatsappUser | null>;
 
-  constructor(protected auth: AuthenticationService) {}
+  constructor(private store: Store) {}
+
+  logout() {
+    this.store.dispatch(new Logout());
+  }
 }

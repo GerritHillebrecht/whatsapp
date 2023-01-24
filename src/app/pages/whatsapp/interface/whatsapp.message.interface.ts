@@ -4,6 +4,7 @@ import { WhatsappUser } from './whatsapp.user.interface';
 export interface WhatsappMessageQueryDto {
   __typename?: 'Message';
   id: number;
+  uuid: string;
   body: string;
   sender: WhatsappUser;
   receiver: WhatsappUser;
@@ -23,6 +24,7 @@ export type WhatsappMessageDeliveryStatus = 'pending' | 'delivered' | 'read';
 export const MessageFragment = gql`
   fragment MessageFragment on Message {
     id
+    uuid
     body
     isRead
     image

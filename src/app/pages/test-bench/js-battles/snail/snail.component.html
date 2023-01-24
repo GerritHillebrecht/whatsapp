@@ -1,15 +1,28 @@
+<form [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Matrix Size</mat-label>
+    <input
+      matInput
+      type="number"
+      min="1"
+      max="15"
+      formControlName="matrixSize"
+    />
+  </mat-form-field>
+</form>
+
 <div
-  class="grid gap-2 max-w-7xl mx-auto aspect-square outline-1 outline-double outline-rose-400 my-4 p-4"
+  class="grid gap-1 max-w-2xl mx-auto aspect-square outline-1 outline-double outline-rose-400 my-4 p-4"
   [ngStyle]="{
     gridTemplateColumns: 'repeat(' + matrixSize + ', 1fr)',
     gridTemplateRows: 'repeat(' + matrixSize + ', 1fr)'
   }"
 >
-  <!-- <div
+  <div
     #tile
     class="tile border-2 border-rose-400 border-solid place-items-center grid"
     *ngFor="let tile of tiles; let index = index"
   >
-    {{ index + 1 }}
-  </div> -->
+    <span class="text-xs">{{ index + 1 }}</span>
+  </div>
 </div>

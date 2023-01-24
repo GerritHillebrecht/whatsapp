@@ -12,9 +12,16 @@ import { AuthenticationState } from '@auth/store/authentication.state';
   declarations: [],
   imports: [
     CommonModule,
-    NgxsModule.forRoot([AuthenticationState, ThemeState, WhatsappState], {
-      developmentMode: !environment.production,
-    }),
+    NgxsModule.forRoot(
+      [
+        ThemeState,
+        AuthenticationState,
+        WhatsappState
+      ],
+      {
+        developmentMode: !environment.production,
+      }
+    ),
     NgxsLoggerPluginModule.forRoot({
       disabled: environment.production,
     }),

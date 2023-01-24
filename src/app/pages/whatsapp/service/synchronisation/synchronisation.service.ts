@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
 import { WatchQueryFetchPolicy } from '@apollo/client/core';
-import { AuthenticationStateModel as ASM } from '@auth/store';
+import { AuthenticationState } from '@auth/store';
 import { Store } from '@ngxs/store';
 import { WhatsappStateModel as WSM } from '@whatsapp/store';
+import {
+  AddMessage,
+  AddMessages,
+  UpdateContacts,
+  UpdateReadStatus,
+} from '@whatsapp/store/whatsapp.actions';
 import { Apollo } from 'apollo-angular';
-import { filter, Observable, takeUntil, tap } from 'rxjs';
+import { filter, Observable, skip, takeUntil, tap } from 'rxjs';
 import { map } from 'rxjs';
 import {
   WhatsappContact,
@@ -13,7 +19,9 @@ import {
   WhatsappMessageQueryDto,
 } from '../../interface';
 import {
-  MARK_MESSAGES_AS_READ_MUTATION,
+  StatusUpdateSubResult,
+  StatusUpdateSubVariables,
+  STATUS_UPDATE_SUBSCRIPTION,
   SubQueryResult,
   SubQueryVariables,
   SUBSCRIPTION_QUERY,
@@ -26,9 +34,16 @@ import {
   providedIn: 'root',
 })
 export class SynchronisationService {
+  takeUntilCondition = this.store
+    .select(({ authentication }) => authentication.whatsappUser)
+    .pipe(skip(1));
+
   constructor(private apollo: Apollo, private store: Store) {}
 
-  syncDataWithServer(id: number): Observable<WhatsappContact[]> {
+  syncDataWithServer(id: number): Observable<{
+    contacts: WhatsappContact[];
+    messageMap: Map<number, WhatsappMessage[]>;
+  }> {
     const syncQueryOptions = {
       query: SYNCHRONIZATION_QUERY,
       variables: { id },
@@ -38,38 +53,160 @@ export class SynchronisationService {
     return this.apollo
       .watchQuery<SyncQueryResult, SyncQueryVariables>(syncQueryOptions)
       .valueChanges.pipe(
-        takeUntil(
-          this.store.select(({ authentication }) => authentication.user)
-        ),
+        takeUntil(this.takeUntilCondition),
         filter((result) => Boolean(result.data)),
         map(({ data: { messages, contacts } }) => {
-          // this.markMessagesAsRead(messages);
-          return this.mapMessagesToContacts(messages, contacts);
+          const messageMap = this.processMessages(messages, contacts);
+          const contactsData = this.processContacts(messageMap, contacts);
+          return { contacts: contactsData, messageMap };
         })
       );
   }
 
-  messageSubscription(id: number): Observable<WhatsappContact[]> {
-    console.log('SUBSCRIPTION STARTED');
-    console.log({ store: this.store.snapshot().authentication });
+  private processMessages(
+    messages: WhatsappMessageQueryDto[],
+    contacts: WhatsappUser[]
+  ): Map<number, WhatsappMessage[]> {
+    return contacts.reduce((messageMap, { id }) => {
+      const contactMessages = this.filterAndMapMessages(messages, id);
+      messageMap.set(id, contactMessages);
+      return messageMap;
+    }, new Map());
+  }
+
+  private processContacts(
+    messages: Map<number, WhatsappMessage[]>,
+    contacts: WhatsappUser[]
+  ): WhatsappContact[] {
+    return contacts.map((contact) => {
+      const contactMessages = messages.get(contact.id) || [];
+      const lastMessage = contactMessages.at(0) || null;
+      const unreadMessages = contactMessages.filter(
+        (message) =>
+          message.sender.id === contact.id &&
+          message.deliveryStatus === 'delivered'
+      ).length;
+
+      return {
+        ...contact,
+        messages: contactMessages,
+        lastMessage,
+        unreadMessages,
+      };
+    });
+  }
+
+  messageSubscription(
+    id: number
+  ): Observable<{ contacts: WhatsappContact[]; message: WhatsappMessage }> {
     const subQueryOptions = {
       query: SUBSCRIPTION_QUERY,
-      variables: {
-        id: this.store.snapshot().authentication.user.id,
-      },
+      variables: { id },
     };
 
     return this.apollo
       .subscribe<SubQueryResult, SubQueryVariables>(subQueryOptions)
       .pipe(
         takeUntil(
-          this.store.select(({ authentication }) => authentication.user)
+          this.store
+            .select(({ authentication }) => authentication.whatsappUser)
+            .pipe(skip(1))
         ),
         filter(({ data }) => Boolean(data)),
-        map(({ data }) =>
-          this.addMessageToContact(data!.messageSubscription, id)
-        )
+        map(({ data }) => {
+          const message = this.mapDtoToMessage(data!.messageSubscription);
+          const currentUserId = this.store.selectSnapshot(
+            ({ authentication }) => authentication.whatsappUser?.id
+          );
+          const selectedUserId = this.store.selectSnapshot(
+            ({ whatsapp }) => whatsapp.selectedContact?.id
+          );
+          const contactId =
+            message.sender.id === currentUserId
+              ? message.receiver.id
+              : message.sender.id;
+
+          if (contactId === selectedUserId) {
+            this.store.dispatch(new UpdateReadStatus([message]));
+          }
+
+          return {
+            contacts: this.addMessageToContact(data!.messageSubscription, id),
+            message,
+          };
+        })
       );
+  }
+
+  messageStatusUpdateSubscription(
+    id: number
+  ): Observable<WhatsappMessageQueryDto> {
+    const subQueryOptions = {
+      query: STATUS_UPDATE_SUBSCRIPTION,
+      variables: { id },
+    };
+
+    return this.apollo
+      .subscribe<StatusUpdateSubResult, StatusUpdateSubVariables>(
+        subQueryOptions
+      )
+      .pipe(
+        takeUntil(
+          this.store
+            .select(({ authentication }) => authentication.whatsappUser)
+            .pipe(skip(1))
+        ),
+        filter(({ data }) => Boolean(data)),
+        map(({ data }) => data!.messageStatusSubscription)
+      );
+  }
+
+  // Hepler Functions //////////////////////////////////////////////////////////
+
+  private updateContactsAndMessages(
+    messages: WhatsappMessageQueryDto[],
+    contacts: WhatsappContact[]
+  ) {
+    const messageMap = this.createMessageMap(contacts, messages);
+
+    const contactsData: WhatsappContact[] = contacts.map((contact) => {
+      const contactMessages = messages
+        .filter(({ sender, receiver }) =>
+          [sender.id, receiver.id].includes(contact.id)
+        )
+        .map((message) => this.mapDtoToMessage(message));
+      messageMap.set(contact.id, contactMessages);
+
+      return {
+        ...contact,
+        messages: contactMessages,
+        lastMessage: contactMessages[contactMessages.length - 1],
+        unreadMessages: 0,
+      };
+    });
+    this.store.dispatch(new AddMessages(messageMap));
+    this.store.dispatch(new UpdateContacts(contactsData));
+  }
+
+  private createMessageMap(
+    contacts: WhatsappContact[],
+    messages: WhatsappMessageQueryDto[]
+  ) {
+    return contacts.reduce(
+      (acc, { id }) => acc.set(id, this.filterAndMapMessages(messages, id)),
+      new Map()
+    );
+  }
+
+  private filterAndMapMessages(
+    messages: WhatsappMessageQueryDto[],
+    contactId: number
+  ) {
+    return messages
+      .filter(({ sender, receiver }) =>
+        [sender.id, receiver.id].includes(contactId)
+      )
+      .map((message) => this.mapDtoToMessage(message));
   }
 
   private addMessageToContact(
@@ -151,7 +288,7 @@ export class SynchronisationService {
   ): WhatsappContact[] {
     return contacts.map((contact) => {
       const filteredMessages = this.filterMessages(messages, contact).map(
-        (message) => this.mapMessage(message)
+        (message) => this.mapDtoToMessage(message)
       );
 
       const unreadMessages = filteredMessages.filter(
@@ -179,8 +316,9 @@ export class SynchronisationService {
     );
   }
 
-  private mapMessage(message: WhatsappMessageQueryDto): WhatsappMessage {
-    const id = this.store.snapshot().authentication.user.id;
+  private mapDtoToMessage(message: WhatsappMessageQueryDto): WhatsappMessage {
+    const id = this.store.snapshot().authentication.whatsappUser?.id;
+    console.log('MAPPING DTO FFS', { id });
     return {
       ...message,
       isMine: id === message.sender.id,

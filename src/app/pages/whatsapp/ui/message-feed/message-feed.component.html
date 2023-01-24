@@ -1,6 +1,5 @@
 <!-- Wrapper -->
 <div
-  *ngIf="messages$"
   #wrapper
   class="h-screen grid grid-rows-[max-content,_auto,_max-content]"
 >
@@ -17,14 +16,14 @@
       <!-- Container for Messages, max-sized, reversed -->
       <div
         #messageContainer
-        *ngIf="messages$ | async as messages; else selectContact"
         class="relative z-10 max-w-[min(100%,_1280px)] min-h-full w-full mx-auto flex flex-end gap-1 flex-col-reverse py-2 sm:py-8 px-2 sm:px-8"
       >
-        <!-- Message Component -->
-        <app-message
-          [message]="message"
-          *ngFor="let message of messages; trackBy: trackByMessageFn"
-        ></app-message>
+        <ng-container *ngIf="messages$ | async as messages; else selectContact">
+          <app-message
+            [message]="message"
+            *ngFor="let message of messages; trackBy: trackByMessageFn"
+          ></app-message>
+        </ng-container>
       </div>
     </div>
   </div>

@@ -7,7 +7,7 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: transparent;;
+    background: transparent;
     // background-color: black;
   }
 
@@ -15,5 +15,43 @@
     background-color: rgba(0, 0, 0, 0.15);
     max-height: 20px;
     border-radius: 20px;
+  }
+}
+
+.slideInDown {
+  animation: slideInDown 0.25s ease-out both;
+}
+
+@keyframes slideInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-15%) scale(1.1);
+  }
+  100% {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.loading-animation {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 20% 100%;
+  background-position: -20% 0%;
+  animation: loading 1.25s infinite ease-in-out both;
+  background-repeat: no-repeat;
+}
+
+// Keyframes called loading that move the background position
+@keyframes loading {
+  0% {
+    background-position: -20% 0;
+  }
+  100% {
+    background-position: 120% 0;
   }
 }

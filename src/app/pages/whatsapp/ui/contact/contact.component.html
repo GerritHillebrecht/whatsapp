@@ -32,23 +32,16 @@
       </span>
     </div>
     <!-- row 2, message preview body -->
-    <span class="line-clamp text-sm sm:text-xs opacity-80">
-      {{ contact.lastMessage?.body || "Schreibe eine Nachricht" }}
-    </span>
-  </div>
-
-  <!-- Col 3, last Message Date + No. of unread messages -->
-  <div
-    *ngIf="contact.unreadMessages > 0"
-    class="flex flex-col relative h-full gap-1"
-  >
-    <!-- Row 1, number of unread messages -->
-    <span class="flex justify-end">
+    <div class="flex flex-row w-full gap-1">
+      <span class="line-clamp grow text-sm sm:text-xs opacity-80">
+        {{ contact.lastMessage?.body || "Schreibe eine Nachricht" }}
+      </span>
       <span
+        *ngIf="contact.unreadMessages > 0"
         class="py-[3px] px-[6px] font-bold text-xs bg-stone-200 text-green-400 rounded-full leading-none"
       >
         {{ contact.unreadMessages }}
       </span>
-    </span>
+    </div>
   </div>
 </div>

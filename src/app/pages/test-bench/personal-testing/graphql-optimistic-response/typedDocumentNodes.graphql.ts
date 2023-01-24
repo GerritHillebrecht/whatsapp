@@ -20,8 +20,8 @@ export const MESSAGE_CREATE_MUTATION = gql`
   ${UserFragment}
   ${MessageFragment}
 
-  mutation SaveMessage($body: String!, $receiverId: Float!, $senderId: Float!) {
-    saveMessage(body: $body, receiverId: $receiverId, senderId: $senderId) {
+  mutation SaveMessage($uuid: String!, $body: String!, $receiverId: Float!, $senderId: Float!) {
+    saveMessage(uuid: $uuid, body: $body, receiverId: $receiverId, senderId: $senderId) {
       ...MessageFragment
       sender {
         ...UserFragment

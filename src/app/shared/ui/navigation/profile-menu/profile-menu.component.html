@@ -1,23 +1,42 @@
-<app-avatar
-  *ngIf="user$ | async as user"
-  #trigger
-  cursor="pointer"
-  [mat-menu-trigger-for]="menu"
-  [imageSrc]="user.image || ''"
-  [initials]="user.firstName[0] + user.lastName[0]"
-  matTooltip="Einstellungen"
-></app-avatar>
-<mat-menu #menu="matMenu" [xPosition]="'before'" class="main-background-color">
-  <button mat-menu-item (click)="darkToggle.clickHandler()">
-    <div class="flex flex-row gap-4 items-center text-stone-800 dark:text-stone-100">
-      <app-darkmode-toggle size="1.5rem" #darkToggle></app-darkmode-toggle>
-      <span>Dark Mode toggle</span>
+<ng-container *ngIf="whatsappUser$ | async as user">
+  <app-avatar
+    #trigger
+    cursor="pointer"
+    [mat-menu-trigger-for]="menu"
+    [imageSrc]="user.image || ''"
+    [initials]="user.firstName[0] + user.lastName[0]"
+    matTooltip="Einstellungen"
+  ></app-avatar>
+  <mat-menu
+    #menu="matMenu"
+    [xPosition]="'before'"
+    class="main-background-color"
+  >
+    <div class="flex flex-col p-4">
+      <span>
+        {{ user.firstName }}
+        {{ user.lastName }}
+      </span>
+      <span class="italic text-xs">{{ user.email }}</span>
     </div>
-  </button>
-  <button mat-menu-item (click)="auth.logout()">
-    <div class="flex flex-row gap-4 items-center text-stone-800 dark:text-stone-100">
-      <mat-icon class="text-[inherit!important] mr-[0!important]">logout</mat-icon>
-      <span>Abmelden</span>
-    </div>
-  </button>
-</mat-menu>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="darkToggle.clickHandler()">
+      <div
+        class="flex flex-row gap-4 items-center text-stone-800 dark:text-stone-100"
+      >
+        <app-darkmode-toggle size="1.5rem" #darkToggle></app-darkmode-toggle>
+        <span>Dark Mode toggle</span>
+      </div>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <div
+        class="flex flex-row gap-4 items-center text-stone-800 dark:text-stone-100"
+      >
+        <mat-icon class="text-[inherit!important] mr-[0!important]"
+          >logout</mat-icon
+        >
+        <span>Abmelden</span>
+      </div>
+    </button>
+  </mat-menu>
+</ng-container>

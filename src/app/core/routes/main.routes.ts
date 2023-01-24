@@ -38,6 +38,8 @@ export const MAIN_ROUTES: Routes = [
       import('@pages/whatsapp/whatsapp.module').then((m) => m.WhatsappModule),
   },
   {
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: registeredOnly },
     path: 'test-bench',
     loadChildren: () =>
       import('@pages/test-bench/test-bench.module').then(

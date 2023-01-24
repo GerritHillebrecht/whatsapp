@@ -1,6 +1,10 @@
 <aside
   class="relative h-screen z-20 bg-white dark:bg-stone-800 shadow-lg grid grid-rows-[max-content,_auto]"
 >
+  <div
+    class="loading-animation absolute h-1 w-full bg-rose-400 top-0 left-0 rounded-lg"
+    *ngIf="syncLoading$ | async"
+  ></div>
   <!-- Header Part with Title & Search-Bar -->
   <header class="flex flex-col gap-2 pt-8 px-6 -mb-5">
     <!-- Header part -->
@@ -32,7 +36,13 @@
   >
     <!-- Contact iterator -->
     <app-contact
-      *ngFor="let contact of contacts"
+      *ngFor="
+        let contact of contacts;
+        trackBy: trackByContactFn;
+        let index = index
+      "
+      class="slideInDown"
+      [ngStyle]="{ 'animation-delay': index * 59 + 'ms' }"
       [contact]="contact"
       [active]="contact.id === (selectedContact$ | async)?.id"
     ></app-contact>

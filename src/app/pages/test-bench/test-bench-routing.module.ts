@@ -21,6 +21,11 @@ const routes: Routes = [
             './personal-testing/graphql-optimistic-response/graphql-optimistic-response.component'
           ).then((m) => m.GraphqlOptimisticResponseComponent),
       },
+      {
+        path: 'circle-to-card',
+        loadComponent: () =>
+          import('./personal-testing/circle-to-card/circle-to-card.component'),
+      },
     ],
   },
 ];

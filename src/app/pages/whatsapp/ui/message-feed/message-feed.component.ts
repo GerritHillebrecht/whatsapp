@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageComponent } from '../message';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { WhatsappState } from '@pages/whatsapp/store';
 import { Observable } from 'rxjs';
 import { WhatsappMessage } from '@pages/whatsapp/interface';
@@ -24,24 +24,30 @@ import { ScreenSizeService } from '@core/services/screen-size';
   templateUrl: './message-feed.component.html',
   styleUrls: ['./message-feed.component.scss'],
 })
-export class MessageFeedComponent implements AfterViewInit {
+export class MessageFeedComponent implements OnInit, AfterViewInit {
   @ViewChild('scroller')
   scroller: ElementRef<HTMLDivElement> | undefined;
 
   @ViewChild('messageContainer')
   messageContainer: ElementRef<HTMLDivElement> | undefined;
 
-  @Select(WhatsappState.displayedMessages)
   messages$: Observable<WhatsappMessage[] | null> | undefined;
 
-  constructor(protected screenSizeService: ScreenSizeService) {}
+  constructor(
+    protected screenSizeService: ScreenSizeService,
+    private store: Store
+  ) {}
+
+  ngOnInit(): void {
+    this.messages$ = this.store.select(WhatsappState.messages(0, 100));
+  }
 
   ngAfterViewInit() {
     this.scrollToBottom();
   }
 
-  protected trackByMessageFn(index: number, message: WhatsappMessage): number {
-    return message.id;
+  protected trackByMessageFn(index: number, message: WhatsappMessage): string {
+    return message.uuid;
   }
 
   private resizeOberserver(callback: Function): ResizeObserver {

@@ -21,15 +21,15 @@ export class MessageComponent implements AfterViewInit {
   @Input()
   message: WhatsappMessage | undefined;
 
-  @Select((state: any) => state.authentication.user)
+  @Select((state: any) => state.authentication.whatsappUser)
   user$: Observable<WhatsappUser> | undefined;
 
   constructor(private service: MessageService) {}
 
   ngAfterViewInit(): void {
-      this.messageRef!.nativeElement.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-        // this.service.showContextMenu(event, this.message!);
-      })
+    this.messageRef!.nativeElement.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      // this.service.showContextMenu(event, this.message!);
+    });
   }
 }

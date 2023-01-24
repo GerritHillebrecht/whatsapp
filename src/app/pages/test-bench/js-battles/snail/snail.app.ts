@@ -1,91 +1,93 @@
-import { ElementRef, QueryList } from '@angular/core';
-
-export function initSnail(size: number): number[] {
-  return Array.from({ length: Math.pow(size, 2) }, (_, i) => i).map((val) =>
-    tileNumber(size, val + 1)
-  );
+interface CalcData {
+  i: number;
+  n: number;
+  loop: number;
+  sumOfLastBreakpoints: number;
+  direction: number;
+  sidelength: number;
+  relativePos: number;
 }
 
-function tileNumber(size: number, i: number) {
-  const { breakpoint, sideLength, lap } = lapBreakpoints(size).find(
-    ({ breakpoint }) => i >= breakpoint
-  );
+export function snail(n = 10): number[] {
+  const sidelengths: number[] = getSidelengths(n);
+  const breakpoints: number[] = getBreakpoints(sidelengths);
+  const snailArray = Array.from({ length: n * n }, (_, i) => i).map((i) => {
+    const loop = getCurrentLoop(i, breakpoints);
+    const sidelength = sidelengths[loop];
+    const sumOfLastBreakpoints = getSumOfLastBreakpoints(loop, sidelengths);
+    const direction = Math.floor((i - sumOfLastBreakpoints) / sidelength);
+    const relativePos =
+      (i - sumOfLastBreakpoints - direction * sidelength) % sidelength;
+    console.log({
+      i,
+      loop,
+      sidelength,
+      sumOfLastBreakpoints,
+      direction,
+      relativePos,
+    });
+    const pos = calculate({
+      i,
+      n,
+      loop,
+      sumOfLastBreakpoints,
+      direction,
+      sidelength,
+      relativePos,
+    });
 
-  const lapOffset = lap * size + Math.floor((size - sideLength) / 2);
-  const fixMeLater = breakpoint > 0 ? 0 : 1;
-  const dir = Math.floor((i - breakpoint - fixMeLater) / sideLength) % 4;
-  const lineOffset = directionScore(
-    size,
-    lap,
-    dir,
-    ((i - breakpoint - fixMeLater) % sideLength) + 1
-  );
-  const tilePosition = lapOffset + lineOffset;
+    // Variant 2, later
+    const numbersArrays = Array.from({ length: n }, (_, i) => i).map((_, i) => {
+      return Array.from({ length: n }, (_, j) => i * n + j + 1);
+    });
 
-  console.table({
-    i,
-    dir,
-    tilePosition,
-    lapOffset,
-    lineOffset,
-    breakpoint,
-    sideLength,
-    lap,
+    return pos;
   });
-  return tilePosition;
+
+  return snailArray;
 }
 
-function directionScore(
-  size: number,
-  lap: number,
-  dir: number,
-  lineOffset: number
-): number {
-  return [
-    () => lineOffset * 1,
-    () => (size - lap) * lineOffset,
-    () => Math.pow(size - lap, 2) - lineOffset * 1 + 1,
-    () => size * (size - lap) - size * lineOffset + 1,
-  ][dir]();
+function calculate({
+  i,
+  n,
+  loop,
+  sumOfLastBreakpoints,
+  direction,
+  sidelength,
+  relativePos,
+}: CalcData): number {
+  const calculations = [
+    () =>
+      loop * n + loop + (i - sumOfLastBreakpoints - direction * sidelength) + 1,
+    () => loop * n + sidelength + 1 + loop + relativePos * n,
+    () => n * n - loop * n - relativePos - loop,
+    () => n * (n - loop) - (n - loop - 1) - relativePos * n,
+  ];
+
+  return calculations[direction]();
 }
 
-function lapBreakpoints(size: number): any[] {
-  return Array.from({ length: Math.ceil(size / 2) }, (_, i) => i)
-    .map((lap) => {
-      const breakpoint = sumLapBreakpoints(size, lap);
-      const sideLength = calculateBreakpoint(size, lap) / 4;
-      return {
-        breakpoint,
-        sideLength,
-        lap,
-      };
-    })
-    .reverse();
-}
-
-function sumLapBreakpoints(size: number, lap: number): number {
-  return Array.from({ length: lap }, (_, i) => i).reduce(
-    (acc, lap) => acc + calculateBreakpoint(size, lap),
+function getSumOfLastBreakpoints(n: number, sidelenghts: number[]): number {
+  return Array.from({ length: n }, (_, i) => sidelenghts[i] * 4).reduce(
+    (acc, i) => acc + i,
     0
   );
 }
 
-function calculateBreakpoint(size: number, lap: number): number {
-  return (size - (lap * 2 + 1)) * 4;
+function getSidelengths(n: number): number[] {
+  return Array.from({ length: Math.round(n / 2) }, (_, lap) => n - 1 - lap * 2);
 }
 
-export function renderTiles(
-  tiles: QueryList<ElementRef<HTMLDivElement>>,
-  matrixSize: number
-) {
-  tiles.toArray().forEach((tile, i) => {
-    tile.nativeElement.style.setProperty('--transition-delay', `${i * 20}ms`);
-    tile.nativeElement.style.setProperty(
-      '--tile-color',
-      `hsl(210, 100%, ${Math.round((i / Math.pow(matrixSize, 2)) * 100)}%)`
-    );
-    setTimeout(() => {
-      tile.nativeElement.classList.add('active');
-    }, 1);
-  });
+function getBreakpoints(sidelengths: number[]): number[] {
+  return sidelengths.reduce((acc, sidelength, index) => {
+    const prev = acc[index - 1] || 0;
+    const current: number = sidelength * 4 + prev;
+    return [...acc, current];
+  }, [] as number[]);
+}
+
+function getCurrentLoop(i: number, breakpoints: number[]) {
+  return breakpoints.reduce((acc, breakpoint, index) => {
+    return i >= breakpoint ? index + 1 : acc;
+  }, 0);
 }

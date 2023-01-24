@@ -15,6 +15,7 @@
   >
     <span class="opacity-60">{{ message.createdAt | date : "shortTime" }}</span>
     <app-message-delivery-status
+      *ngIf="message.isMine"
       [status]="message.deliveryStatus"
     ></app-message-delivery-status>
   </div>

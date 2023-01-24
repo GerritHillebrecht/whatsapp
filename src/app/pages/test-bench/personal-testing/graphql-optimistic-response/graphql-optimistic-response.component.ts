@@ -64,6 +64,7 @@ export class GraphqlOptimisticResponseComponent {
           saveMessage: {
             __typename: 'Message',
             id: 0,
+            uuid: '0',
             body: this.form.get('body')?.value,
             isRead: false,
             isMine: true,
@@ -125,6 +126,7 @@ export class GraphqlOptimisticResponseComponent {
         updateMessage: {
           __typename: 'Message',
           id,
+          uuid: message.uuid,
           body: body,
           isRead: false,
           sender: this.store.snapshot().authentication.user,

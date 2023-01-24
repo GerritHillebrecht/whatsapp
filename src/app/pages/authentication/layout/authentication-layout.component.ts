@@ -2,10 +2,15 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
+  LoginWithCredentials,
+  LoginWithGoogle,
+} from '@auth/store/authentication.actions';
+import {
   faFacebook,
   faGithub,
   faGoogle,
 } from '@fortawesome/free-brands-svg-icons';
+import { Store } from '@ngxs/store';
 import { AuthenticationService } from '../service/authentication.service';
 
 interface TestUser {
@@ -52,7 +57,11 @@ export class AuthenticationLayoutComponent {
     },
   ];
 
-  constructor(private auth: AuthenticationService, private router: Router) {
+  constructor(
+    private auth: AuthenticationService,
+    private router: Router,
+    private store: Store
+  ) {
     this.form = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [
@@ -63,24 +72,14 @@ export class AuthenticationLayoutComponent {
   }
 
   googleLogin() {
-    this.auth
-      .loginWithGoogle()
-      .then(() => this.redirect())
-      .catch((error) => console.error(error));
+    this.store.dispatch(new LoginWithGoogle());
   }
 
-  emailAndPasswordLogin(email: string, password: string) {
-    this.auth
-      .loginWithEmail(email, password)
-      .then(() => this.redirect())
-      .catch((error) => console.error(error));
+  loginWithCredentials(email: string, password: string) {
+    this.store.dispatch(new LoginWithCredentials(email, password));
   }
 
   testUserClickHandler(user: TestUser) {
-    this.emailAndPasswordLogin(user.email, 'abc123');
-  }
-
-  private redirect() {
-    this.router.navigate(['/whatsapp']);
+    this.loginWithCredentials(user.email, 'abc123');
   }
 }

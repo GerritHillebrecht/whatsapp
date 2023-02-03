@@ -12,6 +12,7 @@ import { Select } from '@ngxs/store';
 import { AuthenticationState } from '@auth/store';
 import { Observable } from 'rxjs';
 import { WhatsappUser } from '@whatsapp/interface';
+import { DarkmodeToggleComponent } from '@shared/ui/toogle/darkmode';
 
 @Component({
   selector: 'app-main-toolbar',
@@ -24,6 +25,7 @@ import { WhatsappUser } from '@whatsapp/interface';
     RouterModule,
     LogoComponent,
     ProfileMenuComponent,
+    DarkmodeToggleComponent
   ],
   templateUrl: './main-toolbar.component.html',
   styleUrls: ['./main-toolbar.component.scss'],

@@ -1,0 +1,73 @@
+<section class="h-screen main-background-color px-8">
+  <div
+    class="max-w-7xl mx-auto h-full grid auto-rows-auto sm:grid-cols-12 gap-2 sm:grid-rows-[repeat(12,1fr)]"
+  >
+    <div
+      style="grid-area: 6 / 5 / 10 / -1"
+      class="moveInCircle relative grid place-items-center"
+    >
+      <div
+        class="rounded-full w-64 aspect-square bg-rose-400 blur-2xl absolute -translate-y-16 translate-x-4 mix-blend-multiply"
+      ></div>
+      <div
+        class="rounded-full w-80 aspect-square bg-purple-400 blur-2xl translate-y-32 -translate-x-24 absolute mix-blend-multiply"
+      ></div>
+      <div
+        class="rounded-full w-56 aspect-square bg-cyan-400 blur-2xl absolute translate-y-24 mix-blend-multiply"
+      ></div>
+    </div>
+    <div
+      class="grid sm:grid-rows-2 sm:grid-cols-2 sm:gap-2 z-10"
+      style="grid-area: 4 / 1 / 10 / 5"
+    >
+      <div
+        class="portrait portrait-1 rounded-tl-[3rem] rounded-br-[3rem]"
+      ></div>
+      <div class="portrait portrait-2 rounded-tr-[3rem]"></div>
+      <div
+        class="portrait portrait-3 rounded-bl-[3rem] rounded-tr-[3rem]"
+      ></div>
+      <div class="portrait portrait-4 rounded-br-[3rem]"></div>
+    </div>
+    <div class="row-span-2 col-span-2 row-start-6 col-start-2 z-40">
+      <div
+        class="bg-lime-500 w-full aspect-square rounded-full grid place-items-center border-[7px] border-solid border-stone-100 dark:border-stone-900 z-10 shadow-xl"
+      >
+        <div
+          class="w-[calc(100%_-_8px)] aspect-square border-[7px] border-solid border-stone-100 dark:border-stone-900 bg-lime-500 text-stone-100 rounded-full grid place-content-center"
+        >
+          <app-logo size="5x" [showIcon]="true" [showText]="false"></app-logo>
+        </div>
+      </div>
+    </div>
+    <div
+      class="flex items-center justify-center relative"
+      style="grid-area: 7 / 6 / 12 / -1"
+    >
+      <canvas #canvas id="canvas3d"></canvas>
+    </div>
+    <div class="relative" style="grid-area: 4 / 6 / 6 / -1">
+      <span class="text-[6rem] leading-none text-inherit font-black">
+        WhatsApp
+      </span>
+    </div>
+    <div
+      class="relative flex flex-col items-start gap-4"
+      style="grid-area: 5 / 6 / 8 / -1"
+    >
+      <span class="text-lg text-inherit">
+        WhatsApp ist eine einfache, kostenlose und zuverlässige
+        Kommunikationsplattform, die Benutzern die Möglichkeit bietet, Texte,
+        Sprach- und Videoanrufe, sowie das Teilen von Medien und Dokumenten mit
+        Freunden, Familie und Geschäftskontakten über eine Internetverbindung zu
+        tätigen.
+      </span>
+      <button
+        class="outline-transparent bg-lime-500 rounded-2xl cursor-pointer shadow-lg text-stone-50 px-8 py-2 hover:scale-105 hover:-translate-y-1 transition-all"
+        routerLink="/whatsapp"
+      >
+        Zeig es mir
+      </button>
+    </div>
+  </div>
+</section>

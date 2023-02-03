@@ -31,6 +31,7 @@
     "@ngxs/logger-plugin": "^3.7.6-dev.master-4d7e301",
     "@ngxs/storage-plugin": "^3.7.6",
     "@ngxs/store": "^3.7.6-dev.master-4d7e301",
+    "@splinetool/runtime": "^0.9.202",
     "apollo-angular": "^4.2.0",
     "dayjs": "^1.11.7",
     "graphql": "^16",

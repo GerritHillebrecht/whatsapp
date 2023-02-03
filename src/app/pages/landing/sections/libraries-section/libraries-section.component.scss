@@ -1,0 +1,92 @@
+.headline {
+  color: transparent;
+  opacity: 0.85;
+  background-color: #d946ef; /* fallback for old browsers */
+  background-image: -webkit-linear-gradient(
+    45deg,
+    #c0392b,
+    #8e44ad
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background-image: linear-gradient(
+    45deg,
+    #c0392b,
+    #8e44ad
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+html:has(.dark) {
+  --gradient-color: var(--gradient-dark-color);
+}
+
+.cards {
+  $gradient-color: rgb(217, 70, 239);
+  $gradient-color: rgb(73, 45, 77);
+  --gradient-light-color: 73, 45, 77;
+  --gradient-dark-color: 217, 70, 239;
+  --gradient-color: var(--gradient-light-color);
+
+  --gradient-size: 100rem;
+  --gradient-border-size: 4px;
+  --gradient-color-max-opacity: 0.8;
+  --gradient-visbility: 0;
+
+  transition: 0.35s all;
+
+  &:hover {
+    --gradient-visbility: var(--gradient-color-max-opacity);
+  }
+
+  .card {
+    transition-duration: 0.35s;
+    transition-property: all;
+    overflow: hidden;
+    background: radial-gradient(
+      var(--gradient-size) circle at var(--xPos) var(--yPos),
+      rgba(var(--gradient-color), var(--gradient-visbility)),
+      transparent 15%
+    );
+
+    &:hover {
+      transition-property: background;
+      &::before {
+        opacity: 1;
+      }
+
+      .card-content img {
+        --tw-saturate: saturate(1);
+        --tw-brightness: brightness(1);
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      z-index: 10;
+      transition: 0.2s all ease-in-out;
+      background: radial-gradient(
+        calc(var(--gradient-size) * 0.85) circle at var(--xPos) var(--yPos),
+        rgba(var(--gradient-color), 0.125),
+        transparent 20%
+      );
+    }
+
+    .card-content {
+      --card-content-size: calc(100% - var(--gradient-border-size));
+
+      border-radius: inherit;
+      transition: all 0.25s;
+      height: var(--card-content-size);
+      width: var(--card-content-size);
+
+      img {
+        width: 180px;
+        height: 180px;
+        object-fit: contain;
+        transition: all 0.35s;
+      }
+    }
+  }
+}

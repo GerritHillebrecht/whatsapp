@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core';
 import { WatchQueryFetchPolicy } from '@apollo/client/core';
-import { AuthenticationState, AuthenticationStateModel } from '@auth/store';
+import { NotificationService } from '@core/services/notification';
 import { Store } from '@ngxs/store';
-import {
-  WhatsappState,
-  WhatsappStateModel,
-  WhatsappStateModel as WSM,
-} from '@whatsapp/store';
-import {
-  AddMessage,
-  AddMessages,
-  UpdateContacts,
-  UpdateReadStatus,
-} from '@whatsapp/store/whatsapp.actions';
 import { Apollo } from 'apollo-angular';
-import { filter, Observable, skip, takeUntil, tap } from 'rxjs';
+import {
+  catchError,
+  delay,
+  filter,
+  interval,
+  Observable,
+  retryWhen,
+  skip,
+  take,
+  takeUntil,
+  tap,
+  timeout,
+} from 'rxjs';
 import { map } from 'rxjs';
 import {
   WhatsappContact,
@@ -24,12 +25,6 @@ import {
 } from '../../interface';
 import { MessageHelperService } from '../message/message-helper.service';
 import {
-  StatusUpdateSubResult,
-  StatusUpdateSubVariables,
-  STATUS_UPDATE_SUBSCRIPTION,
-  SubQueryResult,
-  SubQueryVariables,
-  MESSAGE_SUBSCRIPTION,
   SYNCHRONIZATION_QUERY,
   SyncQueryResult,
   SyncQueryVariables,
@@ -46,7 +41,8 @@ export class SynchronisationService {
   constructor(
     private apollo: Apollo,
     private store: Store,
-    private helper: MessageHelperService
+    private helper: MessageHelperService,
+    private notification: NotificationService
   ) {}
 
   syncDataWithServer(id: number): Observable<{
@@ -63,6 +59,13 @@ export class SynchronisationService {
       .watchQuery<SyncQueryResult, SyncQueryVariables>(syncQueryOptions)
       .valueChanges.pipe(
         takeUntil(this.takeUntilCondition),
+        catchError(() => {
+          this.notification.notification$.next(
+            'Daten konnten nicht geladen werden, erneuter Versuch in 5 Sekunden'
+          );
+          throw new Error('Error while fetching data');
+        }),
+        retryWhen((errors) => errors.pipe(delay(5000), take(5))),
         filter((result) => Boolean(result.data)),
         map(({ data: { messages, contacts } }) => {
           const messageMap = this.processMessages(messages, contacts);
@@ -107,30 +110,6 @@ export class SynchronisationService {
       };
     });
   }
-
-  messageStatusUpdateSubscription(
-    id: number
-  ): Observable<WhatsappMessageQueryDto> {
-    const subQueryOptions = {
-      query: STATUS_UPDATE_SUBSCRIPTION,
-      variables: { id },
-    };
-
-    return this.apollo
-      .subscribe<StatusUpdateSubResult, StatusUpdateSubVariables>(
-        subQueryOptions
-      )
-      .pipe(
-        takeUntil(
-          this.store
-            .select(({ authentication }) => authentication.whatsappUser)
-            .pipe(skip(1))
-        ),
-        filter(({ data }) => Boolean(data)),
-        map(({ data }) => data!.messageStatusSubscription)
-      );
-  }
-
   // Hepler Functions //////////////////////////////////////////////////////////
 
   private filterAndMapMessages(

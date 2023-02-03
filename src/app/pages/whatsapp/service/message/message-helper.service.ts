@@ -4,7 +4,6 @@ import 'dayjs/locale/de';
 import dayjs from 'dayjs';
 import { Store } from '@ngxs/store';
 import { WhatsappMessage, WhatsappMessageQueryDto } from '@whatsapp/interface';
-import { AuthenticationState } from '@auth/store';
 import { WhatsappState } from '@whatsapp/store';
 import { UpdateReadStatus } from '@whatsapp/store/whatsapp.actions';
 dayjs.extend(relativeTime);
@@ -36,9 +35,12 @@ export class MessageHelperService {
         [sender.id, receiver.id].includes(selectedContact.id)
       );
     });
+
     const messageIds = unreadMessages.map((message) => message.id);
 
-    this.store.dispatch(new UpdateReadStatus(messageIds));
+    if (messageIds.length) {
+      this.store.dispatch(new UpdateReadStatus(messageIds));
+    }
   }
 
   fromNow(date: Date) {

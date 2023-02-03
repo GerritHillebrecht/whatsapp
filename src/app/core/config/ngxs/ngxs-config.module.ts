@@ -5,7 +5,6 @@ import { environment } from '@env/environment';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { ThemeState } from '@core/store/theme/theme.state';
-import { WhatsappState } from '@whatsapp/store';
 import { AuthenticationState } from '@auth/store/authentication.state';
 
 @NgModule({
@@ -16,7 +15,6 @@ import { AuthenticationState } from '@auth/store/authentication.state';
       [
         ThemeState,
         AuthenticationState,
-        WhatsappState
       ],
       {
         developmentMode: !environment.production,

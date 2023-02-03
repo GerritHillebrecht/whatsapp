@@ -21,8 +21,6 @@ registerLocaleData(localeDe);
   imports: [
     AppRoutingModule,
     CoreModule,
-
-    // TODO: Could move these to the CoreModule, but it's not really necessary.
     BrowserModule,
     HttpClientModule,
 

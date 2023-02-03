@@ -26,6 +26,12 @@ const routes: Routes = [
         loadComponent: () =>
           import('./personal-testing/circle-to-card/circle-to-card.component'),
       },
+
+      {
+        path: 'shining-border',
+        loadComponent: () =>
+          import('./personal-testing/card-box-shining-border/card-box-shining-border.component'),
+      },
     ],
   },
 ];

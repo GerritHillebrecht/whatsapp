@@ -3,5 +3,6 @@
     <button mat-button *ngFor="let link of links" [routerLink]="link.path">
       {{ link.label }}
     </button>
+    <app-darkmode-toggle></app-darkmode-toggle>
   </div>
 </mat-toolbar>

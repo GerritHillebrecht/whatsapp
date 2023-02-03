@@ -26,23 +26,6 @@ export const MESSAGE_SUBSCRIPTION = gql`
   }
 `;
 
-export const STATUS_UPDATE_SUBSCRIPTION = gql`
-  ${MessageFragment}
-  ${UserFragment}
-
-  subscription StatusUpdateSubscription($id: Float!) {
-    statusUpdateSubscription(receiverId: $id) {
-      ...MessageFragment
-      sender {
-        ...UserFragment
-      }
-      receiver {
-        ...UserFragment
-      }
-    }
-  }
-`;
-
 export const SYNCHRONIZATION_QUERY = gql`
   ${UserFragment}
   ${MessageFragment}
@@ -80,14 +63,5 @@ export interface SubQueryResult {
 }
 
 export interface SubQueryVariables {
-  id: number;
-}
-
-export interface StatusUpdateSubResult {
-  __typename: string;
-  messageStatusSubscription: WhatsappMessageQueryDto;
-}
-
-export interface StatusUpdateSubVariables {
   id: number;
 }

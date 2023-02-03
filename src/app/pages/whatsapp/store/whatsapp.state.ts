@@ -25,8 +25,9 @@ import {
   AuthenticationState,
   AuthenticationStateModel as ASM,
 } from '@auth/store';
-import { filter } from 'rxjs';
+import { filter, tap } from 'rxjs';
 import { MessageSubscriptionService } from '@whatsapp/service/subscription/message/message-subscription.service';
+import { ReadUpdateSubscriptionService } from '@whatsapp/service/subscription/read-status/read-update-subscription.service';
 
 export interface WhatsappStateModel {
   selectedContact: WhatsappContact | null;
@@ -79,6 +80,7 @@ export class WhatsappState implements NgxsOnInit {
   constructor(
     private store: Store,
     private messageService: MessageService,
+    private readUpdateService: ReadUpdateSubscriptionService,
     private messageSubscriptService: MessageSubscriptionService,
     private syncService: SynchronisationService
   ) {}
@@ -100,15 +102,21 @@ export class WhatsappState implements NgxsOnInit {
     { id }: SyncWithServer
   ) {
     patchState({ loadingStates: { sync: true } });
-    this.syncService.syncDataWithServer(id).subscribe({
-      next: ({ contacts, messageMap }) => {
-        patchState({ loadingStates: { sync: false } });
-        dispatch(new UpdateContacts(contacts));
-        dispatch(new AddMessages(messageMap));
-      },
-      error: (err) => console.error(err),
-      complete: () => {},
-    });
+    this.syncService
+      .syncDataWithServer(id)
+      .pipe(tap(() => patchState({ loadingStates: { sync: false } })))
+      .subscribe({
+        next: ({ contacts, messageMap }) => {
+          dispatch(new UpdateContacts(contacts));
+          dispatch(new AddMessages(messageMap));
+        },
+        error: (err) => {
+          console.error(err);
+        },
+        complete: () => {
+          patchState({ loadingStates: { sync: false } });
+        },
+      });
   }
 
   @Action(SubscribeToMessages)
@@ -118,6 +126,7 @@ export class WhatsappState implements NgxsOnInit {
   ) {
     this.messageSubscriptService.messageSubscription(id).subscribe({
       next: ({ contacts, message }) => {
+        console.log('message', message);
         dispatch(new AddMessage(message));
         dispatch(new UpdateContacts(contacts));
       },
@@ -136,16 +145,11 @@ export class WhatsappState implements NgxsOnInit {
     { dispatch }: StateContext<WhatsappStateModel>,
     { id }: SubscribeToReadStatus
   ) {
-    // this.syncService.readStatusSubscription(id).subscribe({
-    //   next: (contacts) => dispatch(new UpdateContacts(contacts)),
-    //   error: (err) => console.error(err),
-    //   complete: () => {
-    //     console.log(
-    //       '%cRead Status Subscription Terminated, user emitted value',
-    //       'font-size: 40px; color: green;'
-    //     );
-    //   },
-    // });
+    this.readUpdateService.readStatusUpdateSubscription(id).subscribe({
+      next: (messageIds) => {
+        console.log('read status updated', messageIds);
+      },
+    });
   }
 
   @Action(SelectContact)
@@ -190,7 +194,7 @@ export class WhatsappState implements NgxsOnInit {
 
   @Action(UpdateReadStatus)
   updateReadStatus(
-    { patchState, getState }: StateContext<WhatsappStateModel>,
+    ctx: StateContext<WhatsappStateModel>,
     { messageIds }: UpdateReadStatus
   ) {
     this.messageService.updateReadStatus(messageIds).subscribe({

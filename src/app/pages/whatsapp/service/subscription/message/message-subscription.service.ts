@@ -66,16 +66,24 @@ export class MessageSubscriptionService {
       (contact) => contact.id === (isMine ? receiver.id : sender.id)
     );
 
-    contacts[contactIndex].lastMessage = message;
-    contacts[contactIndex].unreadMessages += isMine ? 0 : 1;
-    contacts[contactIndex].messages.unshift(message);
-
     this.markMessageAsRead(message);
 
-    return contacts;
+    return [
+      ...contacts
+        .filter((contact) => contact.id !== contactIndex)
+        .concat({
+          ...contacts[contactIndex],
+          lastMessage: message,
+          unreadMessages: isMine
+            ? 0
+            : contacts[contactIndex].unreadMessages + 1,
+          messages: [message, ...contacts[contactIndex].messages],
+        }),
+    ];
   }
 
   private markMessageAsRead(message: WhatsappMessage): void {
+    if (message.isMine) return;
     const currentUserId = this.store.selectSnapshot(
       ({ authentication }) => authentication.whatsappUser?.id
     );

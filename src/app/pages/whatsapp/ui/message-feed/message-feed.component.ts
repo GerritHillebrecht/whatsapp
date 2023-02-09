@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MessageComponent } from '../message';
-import { Select, Store } from '@ngxs/store';
-import { WhatsappState } from '@pages/whatsapp/store';
+import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { WhatsappMessage } from '@pages/whatsapp/interface';
 import { AfterViewInit } from '@angular/core';
@@ -11,6 +10,7 @@ import { ElementRef } from '@angular/core';
 import { MessageComposerComponent } from '../message-composer';
 import { ContactInfoBarComponent } from '../contact-info-bar';
 import { ScreenSizeService } from '@core/services/screen-size';
+import { WhatsappMessageState } from '@whatsapp/store/message/message.state';
 
 @Component({
   selector: 'app-message-feed',
@@ -24,23 +24,17 @@ import { ScreenSizeService } from '@core/services/screen-size';
   templateUrl: './message-feed.component.html',
   styleUrls: ['./message-feed.component.scss'],
 })
-export class MessageFeedComponent implements OnInit, AfterViewInit {
+export class MessageFeedComponent implements AfterViewInit {
   @ViewChild('scroller')
   scroller: ElementRef<HTMLDivElement> | undefined;
 
   @ViewChild('messageContainer')
   messageContainer: ElementRef<HTMLDivElement> | undefined;
 
+  @Select(WhatsappMessageState.messages(100))
   messages$: Observable<WhatsappMessage[] | null> | undefined;
 
-  constructor(
-    protected screenSizeService: ScreenSizeService,
-    private store: Store
-  ) {}
-
-  ngOnInit(): void {
-    this.messages$ = this.store.select(WhatsappState.messages(0, 100));
-  }
+  constructor(protected screenSizeService: ScreenSizeService) {}
 
   ngAfterViewInit() {
     this.scrollToBottom();

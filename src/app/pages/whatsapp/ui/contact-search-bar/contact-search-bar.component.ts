@@ -25,9 +25,14 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { AvatarComponent } from '@shared/ui/avatar';
 import { Store } from '@ngxs/store';
-import { WhatsappStateModel as WSM, SelectContact } from '@whatsapp/store';
+import {
+  WhatsappStateModel as WSM,
+  SelectContact,
+  WhatsappState,
+} from '@whatsapp/store';
 import { ScreenSizeService } from '@core/services/screen-size';
 import { Router } from '@angular/router';
+import { WhatsappContactState } from '@whatsapp/store/contact/contact.state';
 
 type SearchResults =
   | Observable<{ label: string; contacts: WhatsappUser[] }[]>
@@ -54,7 +59,7 @@ export class ContactSearchBarComponent implements OnInit {
   form: FormGroup;
 
   get searchControl() {
-    return this.form.get('search')!;
+    return this.form.get('search');
   }
 
   searchResults$: SearchResults;
@@ -71,18 +76,14 @@ export class ContactSearchBarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.searchResults$ = this.searchControl.valueChanges.pipe(
+    this.searchResults$ = this.searchControl?.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       filter((input) => input?.length > 0),
       switchMap((input) =>
         combineLatest([
           this.store
-            .select(({ whatsapp }: { whatsapp: WSM }) =>
-              whatsapp.contacts.filter((contact) =>
-                Boolean(contact.lastMessage)
-              )
-            )
+            .select(WhatsappContactState.contacts())
             .pipe(map((contacts) => this.filterContacts(contacts))),
           this.contact.searchUser({ searchString: input }),
         ]).pipe(
@@ -105,7 +106,7 @@ export class ContactSearchBarComponent implements OnInit {
     console.log('contact', contact);
 
     if (!contact) return;
-    this.searchControl.reset();
+    this.searchControl?.reset();
     this.store.dispatch(new SelectContact(contact));
     if (await firstValueFrom(this.screenSize.twSm$)) {
       this.router.navigate(['whatsapp', 'chat']);
@@ -117,12 +118,13 @@ export class ContactSearchBarComponent implements OnInit {
   }
 
   private filterContacts(contacts: WhatsappUser[]): WhatsappUser[] {
+    console.log('filterContacts', contacts);
     return contacts.filter((contact) => {
       const name = `${contact.firstName} ${contact.lastName}`
         .toLowerCase()
         .trim()
         .replaceAll(' ', '');
-      const search = (this.searchControl.value || '')
+      const search = (this.searchControl?.value || '')
         .toLowerCase()
         .trim()
         .replaceAll(' ', '');

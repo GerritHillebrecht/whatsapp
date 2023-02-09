@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContactComponent } from '../contact/contact.component';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import {
   WhatsappState,
   WhatsappStateModel as WSM,
@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { DarkmodeToggleComponent } from '@shared/ui/toogle/darkmode';
 import { ScreenSizeService } from '@core/services/screen-size';
 import { LogoComponent } from '@shared/ui/logo';
+import { WhatsappContactState } from '@whatsapp/store/contact/contact.state';
 
 @Component({
   selector: 'app-contact-feed',
@@ -31,31 +32,30 @@ import { LogoComponent } from '@shared/ui/logo';
   styleUrls: ['./contact-feed.component.scss'],
 })
 export class ContactFeedComponent {
-  @Select(WhatsappState.syncLoading)
+  @Select(WhatsappContactState.loadingState)
   syncLoading$: Observable<boolean> | undefined;
 
-  @Select(({ whatsapp }: { whatsapp: WSM }) =>
-    whatsapp.contacts
-      .filter((contact) => contact.lastMessage || contact.isBot)
-      .sort((a, b) => {
-        return (
-          new Date(b.lastMessage?.createdAt || new Date()).getTime() -
-          new Date(a.lastMessage?.createdAt || new Date()).getTime()
-        );
-      })
-  )
-  contacts$: Observable<WhatsappContact[]> | undefined;
-
-  @Select(({ whatsapp }: { whatsapp: WSM }) => whatsapp.selectedContact)
+  @Select(WhatsappContactState.selectedContact)
   selectedContact$: Observable<WhatsappContact> | undefined;
 
-  constructor(protected screenSizeService: ScreenSizeService) {}
+  @Select(WhatsappContactState.contacts())
+  contacts$: Observable<WhatsappContact[]> | undefined;
 
-  ngOnInit() {
-    this.syncLoading$?.subscribe((loading) => {
-      console.log('syncLoading', loading);
-    });
-  }
+  // @Select(WhatsappState.syncLoading)
+  // syncLoading$: Observable<boolean> | undefined;
+
+  // @Select(WhatsappState.contacts)
+  // contacts2$: Observable<WhatsappContact[]> | undefined;
+
+  // @Select(({ whatsapp }: { whatsapp: WSM }) => whatsapp.selectedContact)
+  // selectedContact2$: Observable<WhatsappContact> | undefined;
+
+  constructor(
+    protected screenSizeService: ScreenSizeService,
+    private store: Store
+  ) {}
+
+  ngOnInit(): void {}
 
   trackByContactFn(index: number, contact: WhatsappContact): number {
     return contact.id;

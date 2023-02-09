@@ -56,7 +56,7 @@ export class GraphqlOptimisticResponseComponent {
 
   private saveMessage(body: string): Observable<any> {
     return this.apollo
-      .mutate<MessageCreateResult, MessageCreateVariables>({
+      .mutate<MessageCreateResult>({
         mutation: MESSAGE_CREATE_MUTATION,
         variables: { body },
         optimisticResponse: () => ({
@@ -66,7 +66,6 @@ export class GraphqlOptimisticResponseComponent {
             id: 0,
             uuid: '0',
             body: this.form.get('body')?.value,
-            isRead: false,
             isMine: true,
             sender: {
               __typename: 'User',
@@ -128,7 +127,6 @@ export class GraphqlOptimisticResponseComponent {
           id,
           uuid: message.uuid,
           body: body,
-          isRead: false,
           sender: this.store.snapshot().authentication.user,
           receiver: this.store.snapshot().whatsapp.selectedContact,
           deliveryStatus: 'pending' as WhatsappMessage['deliveryStatus'],

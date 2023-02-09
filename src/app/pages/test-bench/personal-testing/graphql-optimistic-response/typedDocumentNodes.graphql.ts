@@ -76,7 +76,10 @@ export interface MessageCreateResult {
 }
 
 export interface MessageCreateVariables {
+  uuid: string;
   body: string;
+  receiverId: number;
+  senderId: number;
 }
 
 export interface MessageUpdateResult {

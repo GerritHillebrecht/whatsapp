@@ -1,4 +1,10 @@
-import { WhatsappContact, WhatsappMessage } from '../interface';
+import { MessageMap } from '@whatsapp/service/synchronisation/synchronisation.service';
+import { WhatsappContact, WhatsappMessage, WhatsappUser } from '../interface';
+
+export class SetWhatsappUser {
+  static readonly type = '[Whatsapp] Set whatsapp user';
+  constructor(public whatsappUser: WhatsappUser | null) {}
+}
 
 export class SyncWithServer {
   static readonly type = '[Whatsapp] Synchronize with server';
@@ -27,7 +33,7 @@ export class SelectContact {
 
 export class AddMessages {
   static readonly type = '[Whatsapp] Add messages';
-  constructor(public messages: Map<number, WhatsappMessage[]>) {}
+  constructor(public messages: MessageMap) {}
 }
 
 export class AddMessage {
@@ -47,4 +53,9 @@ export class UpdateContacts {
 
 export class ResetWhatsappState {
   static readonly type = '[Whatsapp] Reset state';
+}
+
+export class SetLoadingState {
+  static readonly type = '[Whatsapp] Set loading state';
+  constructor(public loadingState: boolean) {}
 }

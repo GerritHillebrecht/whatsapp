@@ -1,9 +1,9 @@
 <mat-icon
-  class="w-[min-content!important] h-[min-content!important] relative -bottom-[1px] dark:text-stone-300"
-  style="font-size: inherit; line-height: inherit;"
+  class="w-[min-content!important] h-[min-content!important] relative -bottom-[1px]"
+  style="font-size: inherit; line-height: inherit"
   [ngSwitch]="status"
   [ngClass]="{
-    'text-slate-600': status !== 'read',
+    'dark:text-stone-300 text-slate-600': status !== 'read',
     'text-sky-500': status === 'read'
   }"
 >

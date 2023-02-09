@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { State, Action, StateContext, NgxsOnInit } from '@ngxs/store';
 import { startWith } from 'rxjs';
 import { fromEvent } from 'rxjs';
-import { SetTheme } from './theme.actions';
+import { SetMode, SetTheme } from './theme.actions';
 
 export interface ThemeStateModel {
   colorScheme: 'light' | 'dark';
@@ -10,7 +10,7 @@ export interface ThemeStateModel {
 }
 
 const defaults: ThemeStateModel = {
-  colorScheme: 'light',
+  colorScheme: 'dark',
   mode: 'os',
 };
 
@@ -22,7 +22,9 @@ const defaults: ThemeStateModel = {
 export class ThemeState implements NgxsOnInit {
   ngxsOnInit({ getState, dispatch }: StateContext<ThemeStateModel>) {
     dispatch(new SetTheme(getState().colorScheme));
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
     fromEvent<MediaQueryList>(mediaQuery, 'change')
       .pipe(startWith(mediaQuery))
       .subscribe((darkScheme: MediaQueryList) => {
@@ -37,9 +39,14 @@ export class ThemeState implements NgxsOnInit {
     { patchState }: StateContext<ThemeStateModel>,
     { colorScheme }: SetTheme
   ) {
-    patchState({ colorScheme });
+    patchState({ colorScheme, mode: colorScheme });
     colorScheme === 'dark'
       ? document.documentElement.classList.add('dark')
       : document.documentElement.classList.remove('dark');
+  }
+
+  @Action(SetMode)
+  setMode({ patchState }: StateContext<ThemeStateModel>, { mode }: SetMode) {
+    patchState({ mode });
   }
 }

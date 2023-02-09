@@ -37,7 +37,6 @@ export const WhatsappUserFragments = {
         lastName
         image
       }
-      isRead
       createdAt
       updatedAt
     }

@@ -8,7 +8,6 @@ export interface WhatsappMessageQueryDto {
   body: string;
   sender: WhatsappUser;
   receiver: WhatsappUser;
-  isRead: boolean;
   image?: string | null;
   deliveryStatus: WhatsappMessageDeliveryStatus;
   createdAt: Date;
@@ -26,7 +25,6 @@ export const MessageFragment = gql`
     id
     uuid
     body
-    isRead
     image
     deliveryStatus
     createdAt

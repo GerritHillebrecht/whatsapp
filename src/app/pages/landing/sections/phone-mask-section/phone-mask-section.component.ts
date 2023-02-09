@@ -14,13 +14,13 @@ import { RouterModule } from '@angular/router';
 })
 export class PhoneMaskSectionComponent implements OnInit {
   ngOnInit(): void {
-    const canvasRef = document.getElementById('canvas3d') as HTMLCanvasElement;
-    const app = new Application(canvasRef);
-    app
-      .load('https://prod.spline.design/vn5s4dnj4RJEENam/scene.splinecode')
-      .then((canvas) => {
-        canvasRef.classList.add('animate');
-        return canvas;
-      });
+    // const canvasRef = document.getElementById('canvas3d') as HTMLCanvasElement;
+    // const app = new Application(canvasRef);
+    // app
+    //   .load('https://prod.spline.design/vn5s4dnj4RJEENam/scene.splinecode')
+    //   .then((canvas) => {
+    //     canvasRef.classList.add('animate');
+    //     return canvas;
+    //   });
   }
 }

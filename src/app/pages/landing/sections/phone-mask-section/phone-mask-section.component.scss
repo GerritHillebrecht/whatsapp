@@ -14,6 +14,17 @@
   }
 }
 
+.radial-gradient {
+  background: radial-gradient(
+    circle,
+    rgba(217, 70, 239, 0.2) 0%,
+    rgba(255, 255, 255, 0) 40%
+  );
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 .portrait {
   background-position: center;
   background-size: cover;

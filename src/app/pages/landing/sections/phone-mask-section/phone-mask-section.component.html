@@ -1,24 +1,23 @@
 <section class="h-screen main-background-color px-8">
   <div
-    class="max-w-7xl mx-auto h-full grid auto-rows-auto sm:grid-cols-12 gap-2 sm:grid-rows-[repeat(12,1fr)]"
+    class="radial-gradient max-w-7xl mx-auto h-full grid auto-rows-auto sm:grid-cols-12 gap-2 sm:grid-rows-[repeat(12,1fr)]"
   >
     <div
       style="grid-area: 6 / 5 / 10 / -1"
-      class="moveInCircle relative grid place-items-center"
+      class="moveInCircle relative grid place-items-center dark:opacity-50"
     >
       <div
-        class="rounded-full w-64 aspect-square bg-rose-400 blur-2xl absolute -translate-y-16 translate-x-4 mix-blend-multiply"
+        class="rounded-full w-64 aspect-square bg-rose-400 blur-3xl absolute -translate-y-16 translate-x-4 mix-blend-multiply"
       ></div>
       <div
-        class="rounded-full w-80 aspect-square bg-purple-400 blur-2xl translate-y-32 -translate-x-24 absolute mix-blend-multiply"
+        class="rounded-full w-80 aspect-square bg-purple-400 blur-3xl translate-y-32 -translate-x-24 absolute mix-blend-multiply"
       ></div>
       <div
-        class="rounded-full w-56 aspect-square bg-cyan-400 blur-2xl absolute translate-y-24 mix-blend-multiply"
+        class="rounded-full w-56 aspect-square bg-cyan-400 blur-3xl absolute translate-y-24 mix-blend-multiply"
       ></div>
     </div>
     <div
-      class="grid sm:grid-rows-2 sm:grid-cols-2 sm:gap-2 z-10"
-      style="grid-area: 4 / 1 / 10 / 5"
+      class="grid sm:grid-rows-2 sm:grid-cols-2 sm:gap-2 z-10 sm:col-span-4 sm:row-span-6 sm:col-start-1 sm:row-start-4"
     >
       <div
         class="portrait portrait-1 rounded-tl-[3rem] rounded-br-[3rem]"
@@ -31,30 +30,30 @@
     </div>
     <div class="row-span-2 col-span-2 row-start-6 col-start-2 z-40">
       <div
-        class="bg-lime-500 w-full aspect-square rounded-full grid place-items-center border-[7px] border-solid border-stone-100 dark:border-stone-900 z-10 shadow-xl"
+        class="bg-lime-500 mx-auto portrait:w-full landscape:h-full aspect-square rounded-full grid place-items-center border-[7px] border-solid border-stone-100 dark:border-stone-900 z-10 shadow-xl"
       >
         <div
           class="w-[calc(100%_-_8px)] aspect-square border-[7px] border-solid border-stone-100 dark:border-stone-900 bg-lime-500 text-stone-100 rounded-full grid place-content-center"
         >
-          <app-logo size="5x" [showIcon]="true" [showText]="false"></app-logo>
+          <app-logo size="3x" [showIcon]="true" [showText]="false"></app-logo>
         </div>
       </div>
     </div>
     <div
-      class="flex items-center justify-center relative"
-      style="grid-area: 7 / 6 / 12 / -1"
+      class="flex items-center justify-center relative mix-blend-soft-light"
+      style="grid-area: 7 / 6 / 12 / -1; grid-area: 1 / 6 / -1 / -1"
     >
-      <canvas #canvas id="canvas3d"></canvas>
-    </div>
-    <div class="relative" style="grid-area: 4 / 6 / 6 / -1">
-      <span class="text-[6rem] leading-none text-inherit font-black">
-        WhatsApp
-      </span>
+      <div class="relative w-full aspect-video opacity-70">
+        <canvas #canvas id="canvas3d"></canvas>
+      </div>
     </div>
     <div
       class="relative flex flex-col items-start gap-4"
-      style="grid-area: 5 / 6 / 8 / -1"
+      style="grid-area: 4 / 6 / 10 / -1"
     >
+      <span class="text-[6rem] leading-none text-inherit font-black">
+        WhatsApp
+      </span>
       <span class="text-lg text-inherit">
         WhatsApp ist eine einfache, kostenlose und zuverlässige
         Kommunikationsplattform, die Benutzern die Möglichkeit bietet, Texte,
@@ -63,7 +62,7 @@
         tätigen.
       </span>
       <button
-        class="outline-transparent bg-lime-500 rounded-2xl cursor-pointer shadow-lg text-stone-50 px-8 py-2 hover:scale-105 hover:-translate-y-1 transition-all"
+        class="outline-transparent bg-lime-500 rounded-2xl cursor-pointer shadow-lg text-stone-50 px-8 py-2 hover:scale-105 hover:-translate-y-1 transition-all active:scale-95 active:translate-y-0"
         routerLink="/whatsapp"
       >
         Zeig es mir

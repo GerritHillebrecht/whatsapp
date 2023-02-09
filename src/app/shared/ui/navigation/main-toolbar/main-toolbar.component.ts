@@ -6,12 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { LogoComponent } from '@shared/ui/logo';
 import { RouterModule } from '@angular/router';
-import { AuthenticationService } from '@pages/authentication/service/authentication.service';
 import { ProfileMenuComponent } from '../profile-menu';
-import { Select } from '@ngxs/store';
-import { AuthenticationState } from '@auth/store';
-import { Observable } from 'rxjs';
-import { WhatsappUser } from '@whatsapp/interface';
 import { DarkmodeToggleComponent } from '@shared/ui/toogle/darkmode';
 
 @Component({
@@ -25,12 +20,9 @@ import { DarkmodeToggleComponent } from '@shared/ui/toogle/darkmode';
     RouterModule,
     LogoComponent,
     ProfileMenuComponent,
-    DarkmodeToggleComponent
+    DarkmodeToggleComponent,
   ],
   templateUrl: './main-toolbar.component.html',
   styleUrls: ['./main-toolbar.component.scss'],
 })
-export class MainToolbarComponent {
-  @Select(AuthenticationState.user)
-  user$: Observable<WhatsappUser> | undefined;
-}
+export class MainToolbarComponent {}

@@ -6,6 +6,7 @@ import { MessageDeliveryStatusComponent } from '../message-delivery-status';
 import { MessageService } from '@whatsapp/service';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { WhatsappState } from '@whatsapp/store';
 
 @Component({
   selector: 'app-message',
@@ -21,7 +22,7 @@ export class MessageComponent implements AfterViewInit {
   @Input()
   message: WhatsappMessage | undefined;
 
-  @Select((state: any) => state.authentication.whatsappUser)
+  @Select(WhatsappState.whatsappUser)
   user$: Observable<WhatsappUser> | undefined;
 
   constructor(private service: MessageService) {}

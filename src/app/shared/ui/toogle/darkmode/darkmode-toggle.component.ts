@@ -1,14 +1,16 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Select, Store } from '@ngxs/store';
-import { SetTheme } from '@core/store/theme';
+import { SetMode, SetTheme, ThemeStateModel } from '@core/store/theme';
 import { Observable } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-darkmode-toggle',
   standalone: true,
-  imports: [CommonModule, MatTooltipModule],
+  imports: [CommonModule, MatTooltipModule, MatMenuModule, MatIconModule],
   templateUrl: './darkmode-toggle.component.html',
   styleUrls: ['./darkmode-toggle.component.scss'],
 })
@@ -28,12 +30,15 @@ export class DarkmodeToggleComponent {
     });
   }
 
-  clickHandler() {
+  clickHandler(mode: ThemeStateModel['mode']) {
     this.animate = false;
     setTimeout(() => {
       this.animate = true;
     }, 1);
 
-    this.store.dispatch(new SetTheme(this.dark ? 'light' : 'dark'));
+    this.store.dispatch([
+      new SetMode(mode),
+      new SetTheme(mode === 'os' ? (this.dark ? 'dark' : 'light') : mode),
+    ]);
   }
 }

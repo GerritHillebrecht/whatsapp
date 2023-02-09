@@ -15,8 +15,10 @@ dayjs.locale('de');
 export class MessageHelperService {
   constructor(private store: Store) {}
 
-  mapDtoToMessage(message: WhatsappMessageQueryDto): WhatsappMessage {
-    const currentUserId = this.store.snapshot().authentication.whatsappUser?.id;
+  mapToMsg(message: WhatsappMessageQueryDto): WhatsappMessage {
+    const currentUserId = this.store.selectSnapshot(
+      WhatsappState.whatsappUser
+    )?.id;
 
     return {
       ...message,
@@ -27,6 +29,7 @@ export class MessageHelperService {
 
   markAsRead(messages: WhatsappMessage[]): void {
     const { selectedContact } = this.store.selectSnapshot(WhatsappState);
+    if (!selectedContact) return;
     const unreadMessages = messages.filter((message) => {
       const { sender, receiver, deliveryStatus, isMine } = message;
       return (

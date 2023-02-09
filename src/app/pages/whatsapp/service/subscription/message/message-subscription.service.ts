@@ -1,4 +1,8 @@
 import { Injectable } from '@angular/core';
+import {
+  AuthenticationState,
+  AuthenticationState as AuthState,
+} from '@auth/store';
 
 import { Store } from '@ngxs/store';
 import {
@@ -6,10 +10,15 @@ import {
   WhatsappMessage,
   WhatsappMessageQueryDto,
 } from '@whatsapp/interface';
+import {
+  MessageQueryResult,
+  MESSAGE_QUERY,
+  SyncQueryResult as SyncResult,
+  SyncQueryVariables as SyncVars,
+} from '@whatsapp/service/synchronisation/sync.query';
 import { WhatsappState, WhatsappStateModel as WSM } from '@whatsapp/store';
-import { UpdateReadStatus } from '@whatsapp/store/whatsapp.actions';
 import { Apollo } from 'apollo-angular';
-import { filter, map, Observable, skip, takeUntil } from 'rxjs';
+import { filter, map, Observable, skip, takeUntil, tap } from 'rxjs';
 import { MessageHelperService } from '../../message/message-helper.service';
 import {
   MESSAGE_SUBSCRIPTION,
@@ -21,10 +30,6 @@ import {
   providedIn: 'root',
 })
 export class MessageSubscriptionService {
-  takeUntilCondition = this.store
-    .select(({ authentication }) => authentication.whatsappUser)
-    .pipe(skip(1));
-
   mapDtoToMessage: (dto: WhatsappMessageQueryDto) => WhatsappMessage;
 
   constructor(
@@ -32,71 +37,54 @@ export class MessageSubscriptionService {
     private store: Store,
     private helper: MessageHelperService
   ) {
-    this.mapDtoToMessage = this.helper.mapDtoToMessage.bind(this.helper);
+    this.mapDtoToMessage = this.helper.mapToMsg.bind(this.helper);
   }
 
-  messageSubscription(id: number): Observable<{
-    contacts: WhatsappContact[];
-    message: WhatsappMessage;
-  }> {
+  messageSubscription(id: number): Observable<WhatsappMessage> {
     const subQueryOptions = {
       query: MESSAGE_SUBSCRIPTION,
       variables: { id },
     };
 
+    const takeUntilCondition = this.store
+      .select(AuthenticationState.firebaseUser)
+      .pipe(skip(1));
+
+    console.log(
+      '%c message update subscription',
+      'font-size: 40px; font-weight: bold',
+      { id }
+    );
+
     return this.apollo
       .subscribe<SubQueryResult, SubQueryVariables>(subQueryOptions)
       .pipe(
-        takeUntil(this.takeUntilCondition),
+        tap((data) =>
+          console.log('%cmessage update', 'font-size:40px; color: red', data)
+        ),
+        takeUntil(takeUntilCondition),
         filter(({ data }) => Boolean(data)),
-        map(({ data }) => {
-          const message = this.mapDtoToMessage(data!.messageSubscription);
-          const contacts = this.updateContact(message);
+        map(({ data }) => data!.messageSubscription),
+        map((dto) => this.mapDtoToMessage(dto)),
+        tap((message) => {
+          const cacheQueryOptions = {
+            query: MESSAGE_QUERY,
+            variables: { id },
+          };
 
-          return { contacts, message };
+          this.apollo.client.cache.updateQuery(
+            cacheQueryOptions,
+            (data: MessageQueryResult | null) => {
+              if (!data) return;
+              if (data.messages.some((m) => m.uuid === message.uuid)) return;
+
+              return {
+                ...data,
+                messages: [message, ...(data.messages || [])],
+              };
+            }
+          );
         })
       );
-  }
-
-  private updateContact(message: WhatsappMessage): WhatsappContact[] {
-    const { sender, receiver, isMine } = message;
-    const { contacts }: WSM = this.store.selectSnapshot(WhatsappState);
-
-    const contactIndex = contacts.findIndex(
-      (contact) => contact.id === (isMine ? receiver.id : sender.id)
-    );
-
-    this.markMessageAsRead(message);
-
-    return [
-      ...contacts
-        .filter((contact) => contact.id !== contactIndex)
-        .concat({
-          ...contacts[contactIndex],
-          lastMessage: message,
-          unreadMessages: isMine
-            ? 0
-            : contacts[contactIndex].unreadMessages + 1,
-          messages: [message, ...contacts[contactIndex].messages],
-        }),
-    ];
-  }
-
-  private markMessageAsRead(message: WhatsappMessage): void {
-    if (message.isMine) return;
-    const currentUserId = this.store.selectSnapshot(
-      ({ authentication }) => authentication.whatsappUser?.id
-    );
-    const selectedUserId = this.store.selectSnapshot(
-      ({ whatsapp }) => whatsapp.selectedContact?.id
-    );
-    const contactId =
-      message.sender.id === currentUserId
-        ? message.receiver.id
-        : message.sender.id;
-
-    if (contactId === selectedUserId) {
-      this.store.dispatch(new UpdateReadStatus([message.id]));
-    }
   }
 }

@@ -65,3 +65,48 @@ export interface SubQueryResult {
 export interface SubQueryVariables {
   id: number;
 }
+
+export const MESSAGE_QUERY = gql`
+  ${UserFragment}
+  ${MessageFragment}
+
+  query Messages($id: Float!) {
+    messages(id: $id) {
+      ...MessageFragment
+      sender {
+        ...UserFragment
+      }
+      receiver {
+        ...UserFragment
+      }
+    }
+  }
+`;
+
+export interface MessageQueryResult {
+  __typename: string;
+  messages: WhatsappMessageQueryDto[];
+}
+
+export interface MessageQueryVariables {
+  id: number;
+}
+
+export const CONTACT_QUERY = gql`
+  ${UserFragment}
+
+  query Contacts($id: Float!) {
+    contacts(id: $id) {
+      ...UserFragment
+    }
+  }
+`;
+
+export interface ContactQueryResult {
+  __typename: string;
+  contacts: WhatsappUser[];
+}
+
+export interface ContactQueryVariables {
+  id: number;
+}

@@ -6,7 +6,7 @@ export const MESSAGE_SUBSCRIPTION = gql`
   ${UserFragment}
 
   subscription MessageSubscription($id: Float!) {
-    messageSubscription(receiverId: $id) {
+    messageSubscription(id: $id) {
       ...MessageFragment
       sender {
         ...UserFragment

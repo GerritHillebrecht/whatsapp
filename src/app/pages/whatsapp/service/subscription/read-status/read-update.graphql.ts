@@ -10,7 +10,7 @@ export const READ_UPDATE_SUBSCRIPTION = gql`
   ${UserFragment}
 
   subscription StatusUpdateSubscription($id: Float!) {
-    readupdateSubscription(receiverId: $id) {
+    readupdateSubscription(id: $id) {
       ...MessageFragment
       sender {
         ...UserFragment
@@ -24,7 +24,7 @@ export const READ_UPDATE_SUBSCRIPTION = gql`
 
 export interface StatusUpdateSubResult {
   __typename: string;
-  messageStatusSubscription: WhatsappMessageQueryDto;
+  readupdateSubscription: WhatsappMessageQueryDto[];
 }
 
 export interface StatusUpdateSubVariables {

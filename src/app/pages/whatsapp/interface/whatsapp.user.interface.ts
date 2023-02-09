@@ -1,6 +1,7 @@
 import { gql } from 'apollo-angular';
 
 export interface WhatsappUser {
+  __typename?: 'User';
   id: number;
   email: string;
 

@@ -20,14 +20,6 @@
       <span class="italic text-xs">{{ user.email }}</span>
     </div>
     <mat-divider></mat-divider>
-    <button mat-menu-item (click)="darkToggle.clickHandler()">
-      <div
-        class="flex flex-row gap-4 items-center text-stone-800 dark:text-stone-100"
-      >
-        <app-darkmode-toggle size="1.5rem" #darkToggle></app-darkmode-toggle>
-        <span>Dark Mode toggle</span>
-      </div>
-    </button>
     <button mat-menu-item (click)="logout()">
       <div
         class="flex flex-row gap-4 items-center text-stone-800 dark:text-stone-100"

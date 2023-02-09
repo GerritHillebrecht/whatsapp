@@ -20,22 +20,13 @@ import {
 } from '@ngxs/store';
 import { WhatsappUser } from '@whatsapp/interface';
 import { ResetWhatsappState } from '@whatsapp/store/whatsapp.actions';
-import {
-  catchError,
-  distinctUntilChanged,
-  filter,
-  of,
-  skip,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { catchError, of, skip, switchMap } from 'rxjs';
 
 import {
   LoginWithCredentials,
   LoginWithGoogle,
   Logout,
   RediretToWhatsapp,
-  SetAuthenticatedUser,
   SetFirebaseUser,
   SetWhatsappUser,
 } from './authentication.actions';
@@ -43,9 +34,6 @@ import {
 export interface AuthenticationStateModel {
   firebaseUser: FirebaseUser | null;
   firebaseUserLoading: boolean;
-  whatsappUser: WhatsappUser | null;
-  whatsappUserLoading: boolean;
-  user: WhatsappUser | null;
 }
 
 @State<AuthenticationStateModel>({
@@ -53,37 +41,15 @@ export interface AuthenticationStateModel {
   defaults: {
     firebaseUser: null,
     firebaseUserLoading: true,
-    whatsappUser: null,
-    whatsappUserLoading: true,
-    user: null,
   },
 })
 @Injectable()
 export class AuthenticationState implements NgxsOnInit {
   @Selector()
-  static whatsappUserLoading({
-    whatsappUserLoading,
-  }: AuthenticationStateModel): boolean {
-    return whatsappUserLoading;
-  }
-
-  @Selector()
-  static user({ user }: AuthenticationStateModel): WhatsappUser | null {
-    return user;
-  }
-
-  @Selector()
   static firebaseUser({
     firebaseUser,
   }: AuthenticationStateModel): FirebaseUser | null {
     return firebaseUser;
-  }
-
-  @Selector()
-  static whatsappUser({
-    whatsappUser,
-  }: AuthenticationStateModel): WhatsappUser | null {
-    return whatsappUser;
   }
 
   constructor(
@@ -101,28 +67,6 @@ export class AuthenticationState implements NgxsOnInit {
         next: (firebaseUser) =>
           dispatch(new SetFirebaseUser(parseFirebaseUser(firebaseUser))),
       });
-
-    // Subscribe to the Whatsapp user
-    this.store
-      .select(AuthenticationState.firebaseUser)
-      .pipe(
-        skip(1),
-        switchMap((firebaseUser) =>
-          firebaseUser ? this.authService.getUserData(firebaseUser) : of(null)
-        ),
-        catchError(() => of(null))
-      )
-      .subscribe({
-        next: (whatsappUser) => dispatch(new SetWhatsappUser(whatsappUser)),
-      });
-  }
-
-  @Action(SetAuthenticatedUser)
-  setUser(
-    { patchState }: StateContext<AuthenticationStateModel>,
-    { user }: SetAuthenticatedUser
-  ) {
-    patchState({ user });
   }
 
   @Action(SetFirebaseUser)
@@ -134,17 +78,6 @@ export class AuthenticationState implements NgxsOnInit {
       patchState({ firebaseUser });
     }
     patchState({ firebaseUserLoading: false });
-  }
-
-  @Action(SetWhatsappUser)
-  setWhatsappUser(
-    { patchState, getState }: StateContext<AuthenticationStateModel>,
-    { whatsappUser }: SetWhatsappUser
-  ) {
-    if (whatsappUser?.id !== getState().whatsappUser?.id) {
-      patchState({ whatsappUser });
-    }
-    patchState({ whatsappUserLoading: false });
   }
 
   @Action(LoginWithGoogle)

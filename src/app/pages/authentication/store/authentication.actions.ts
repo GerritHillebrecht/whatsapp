@@ -23,11 +23,6 @@ export class Logout {
 }
 
 // Utitlity Actions
-export class SetAuthenticatedUser {
-  static readonly type = '[Authentication] Set authenticated user';
-  constructor(public user: WhatsappUser | null) {}
-}
-
 export class SetFirebaseUser {
   static type = '[Authentication] Set Firebase user';
   constructor(public firebaseUser: FirebaseUser | null) {}

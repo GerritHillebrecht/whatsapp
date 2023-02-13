@@ -7,7 +7,6 @@ import { MessageFeedComponent, ContactFeedComponent } from './ui';
 import { UserSidebarComponent } from './ui/user-sidebar/user-sidebar.component';
 import { NgxsModule } from '@ngxs/store';
 import { WhatsappState } from './store';
-import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { WhatsappMessageState } from './store/message/message.state';
 import { WhatsappContactState } from './store/contact/contact.state';
 
@@ -27,5 +26,6 @@ import { WhatsappContactState } from './store/contact/contact.state';
     ContactFeedComponent,
     UserSidebarComponent,
   ],
+  providers: [],
 })
 export class WhatsappModule {}

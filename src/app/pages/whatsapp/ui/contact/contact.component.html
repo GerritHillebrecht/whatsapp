@@ -2,7 +2,9 @@
   *ngIf="contact"
   (click)="clickHandler()"
   class="flex px-6 py-2 sm:py-3 sm:px-4 gap-4 sm:gap-3 inter hover:bg-stone-100 hover:dark:bg-stone-700 cursor-pointer sm:rounded-lg"
-  [ngClass]="{ 'bg-stone-100 dark:bg-stone-700': active }"
+  [ngClass]="{
+    'bg-stone-100 dark:bg-stone-700': active && !(screenSize.twSm$ | async)
+  }"
 >
   <!-- Col 1, Avatar -->
   <div class="my-auto shrink-0">
@@ -17,12 +19,16 @@
   <div class="flex flex-col gap-[4px] grow justify-center">
     <!-- row 1, contact name -->
     <div class="flex flex-row justify-between items-center">
-      <span
-        class="text-sm sm:text-xs font-bold"
-        [ngClass]="{ 'text-green-400': contact.unreadMessages > 0 }"
-      >
-        {{ contact.firstName }} {{ contact.lastName }}
-      </span>
+      <div class="text-sm sm:text-xs font-bold flex items-center gap-2">
+        <span [ngClass]="{ 'text-green-400': contact.unreadMessages > 0 }">
+          {{ contact.firstName }} {{ contact.lastName }}
+        </span>
+        <span
+          *ngIf="contact.isBot"
+          class="rounded-xl text-[0.5rem] bg-rose-400 px-2"
+          >BOT</span
+        >
+      </div>
       <span
         class="text-sm sm:text-xs"
         *ngIf="contact.lastMessage"
@@ -34,7 +40,20 @@
     <!-- row 2, message preview body -->
     <div class="flex flex-row w-full gap-1">
       <span class="line-clamp grow text-sm sm:text-xs opacity-80">
-        {{ contact.lastMessage?.body || "Schreibe eine Nachricht" }}
+        {{ contact.lastMessage?.body }}
+        <ng-container
+          *ngIf="!contact.lastMessage?.body && contact.lastMessage?.image"
+        >
+          <span class="flex items-center gap-2">
+            <mat-icon class="material-icons-outlined">image_outline</mat-icon>
+            <i>{{ contact.lastMessage?.image }}</i>
+          </span>
+        </ng-container>
+        <ng-container
+          *ngIf="!contact.lastMessage?.body && !contact.lastMessage?.image"
+        >
+          Schreibe eine Nachricht
+        </ng-container>
       </span>
       <span
         *ngIf="contact.unreadMessages > 0"

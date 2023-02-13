@@ -2,7 +2,7 @@
 
 @layer components {
   .background-dark-color {
-    @apply dark:bg-black sm:dark:bg-stone-900;
+    @apply dark:bg-stone-800 sm:dark:bg-stone-900;
   }
 
   .background-light-color {

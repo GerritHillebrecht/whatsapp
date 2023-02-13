@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { ScreenSizeService } from '@core/services/screen-size';
+import { WhatsappContactState } from '@whatsapp/store';
 
 @Component({
   selector: 'app-contact-info-bar',
@@ -25,7 +26,7 @@ import { ScreenSizeService } from '@core/services/screen-size';
   styleUrls: ['./contact-info-bar.component.scss'],
 })
 export class ContactInfoBarComponent {
-  @Select((state: any) => state.whatsapp.selectedContact)
+  @Select(WhatsappContactState.selectedContact)
   contact$: Observable<WhatsappContact> | undefined;
 
   constructor(protected screenSize: ScreenSizeService) {}

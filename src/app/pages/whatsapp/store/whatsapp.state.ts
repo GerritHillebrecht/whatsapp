@@ -8,9 +8,13 @@ import {
 } from './whatsapp.actions';
 import { MessageMap } from '@whatsapp/service/synchronisation/synchronisation.service';
 import { WhatsappUserService } from '@whatsapp/service/user';
-import { FetchContacts } from './contact/contact.actions';
+import {
+  FetchContacts,
+  ResetWhatsappConctactState,
+} from './contact/contact.actions';
 import {
   FetchMessages,
+  ResetWhatsappMessageState,
   SubscribeToMessages,
   SubscribeToReadUpdates,
 } from './message/message.actions';
@@ -50,6 +54,7 @@ export class WhatsappState implements NgxsOnInit {
       .subscribe((whatsAppUser) => dispatch(new SetWhatsappUser(whatsAppUser)));
 
     this.whatsAppService.initSync().subscribe((whatsAppUserId) => {
+      console.log('%cSTART SYNC', 'color: green; font-size: 40px;');
       dispatch([
         new FetchContacts(whatsAppUserId),
         new FetchMessages(whatsAppUserId),
@@ -76,7 +81,11 @@ export class WhatsappState implements NgxsOnInit {
   }
 
   @Action(ResetWhatsappState)
-  resetState({ setState }: StateContext<WhatsappStateModel>) {
+  resetState({ setState, dispatch }: StateContext<WhatsappStateModel>) {
+    dispatch([
+      new ResetWhatsappConctactState(),
+      new ResetWhatsappMessageState(),
+    ]);
     setState(defaults);
   }
 }

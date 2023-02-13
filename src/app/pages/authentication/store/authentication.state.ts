@@ -4,6 +4,7 @@ import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
+  updateProfile,
   User,
   user,
 } from '@angular/fire/auth';
@@ -18,7 +19,6 @@ import {
   Selector,
   Store,
 } from '@ngxs/store';
-import { WhatsappUser } from '@whatsapp/interface';
 import { ResetWhatsappState } from '@whatsapp/store/whatsapp.actions';
 import { catchError, of, skip, switchMap } from 'rxjs';
 
@@ -28,7 +28,6 @@ import {
   Logout,
   RediretToWhatsapp,
   SetFirebaseUser,
-  SetWhatsappUser,
 } from './authentication.actions';
 
 export interface AuthenticationStateModel {
@@ -64,8 +63,9 @@ export class AuthenticationState implements NgxsOnInit {
     user(this.auth)
       .pipe(catchError(() => of(null)))
       .subscribe({
-        next: (firebaseUser) =>
-          dispatch(new SetFirebaseUser(parseFirebaseUser(firebaseUser))),
+        next: (firebaseUser) => {
+          dispatch(new SetFirebaseUser(parseFirebaseUser(firebaseUser)));
+        },
       });
   }
 

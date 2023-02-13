@@ -63,12 +63,12 @@ export class WhatsappContactState implements NgxsOnInit {
         { messages }: { messages: WhatsappMessage[] },
         { contacts }: { contacts: WhatsappUser[] }
       ) => {
-        return contacts.map((contact) => {
+        const whatsAppContacts = contacts.map((contact) => {
           const contactMessages = messages.filter(({ receiver, sender }) =>
             [receiver.id, sender.id].includes(contact.id)
           );
 
-          const lastMessage = contactMessages.at(-1) || null;
+          const lastMessage = contactMessages.at(0) || null;
           const unreadMessages = contactMessages.filter(
             ({ deliveryStatus, isMine }) => !isMine && deliveryStatus !== 'read'
           ).length;
@@ -79,6 +79,18 @@ export class WhatsappContactState implements NgxsOnInit {
             unreadMessages,
           } as WhatsappContact;
         });
+
+        return [
+          ...whatsAppContacts.sort((a, b) => {
+            if (!a.lastMessage && !b.lastMessage) return 0;
+            if (!a.lastMessage) return 1;
+            if (!b.lastMessage) return -1;
+            return (
+              new Date(b.lastMessage.createdAt).getTime() -
+              new Date(a.lastMessage.createdAt).getTime()
+            );
+          }),
+        ];
       }
     );
   }

@@ -32,8 +32,7 @@ export class AuthenticationLayoutComponent {
 
   testUsers: TestUser[] = [
     {
-      image:
-        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80',
+      image: 'http://afernandes.adv.br/wp-content/uploads/Team-Member-3.jpg',
       displayName: 'John Doe',
       email: 'john.doe@mail.com',
     },
@@ -51,17 +50,13 @@ export class AuthenticationLayoutComponent {
     },
     {
       image:
-        'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=461&q=80',
+        'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80',
       displayName: 'Jana Scherer',
       email: 'janascherer@armyspy.com',
     },
   ];
 
-  constructor(
-    private auth: AuthenticationService,
-    private router: Router,
-    private store: Store
-  ) {
+  constructor(private store: Store) {
     this.form = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [

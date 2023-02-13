@@ -12,9 +12,11 @@ import { MatSliderModule } from '@angular/material/slider';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { ThemeState, ThemeStateModel } from '@core/store/theme';
+import { ScreenSizeService } from '@core/services/screen-size';
+import { RouterModule } from '@angular/router';
 
 @Directive({
   selector: '[shining-border]',
@@ -102,6 +104,7 @@ export class TiltCardDirective implements AfterViewInit {
     FormsModule,
     MatButtonModule,
     MatIconModule,
+    RouterModule,
   ],
   templateUrl: './libraries-section.component.html',
   styleUrls: ['./libraries-section.component.scss'],
@@ -111,8 +114,11 @@ export class LibrariesSectionComponent implements OnInit {
   perspective = 1000;
   tiltPercent = 10;
   color: string = '#d946ef;';
+  small$: Observable<boolean>;
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private screenSize: ScreenSizeService) {
+    this.small$ = this.screenSize.twSm$;
+  }
 
   ngOnInit(): void {
     this.store.select(ThemeState).subscribe((themeState: ThemeStateModel) => {

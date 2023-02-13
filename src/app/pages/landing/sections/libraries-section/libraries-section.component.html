@@ -1,8 +1,8 @@
 <section
-  class="min-h-screen main-background-color flex flex-col gap-8 sm:gap-12 items-center justify-center"
+  class="min-h-[100svh] main-background-color flex flex-col gap-4 sm:gap-12 items-center justify-center"
 >
   <span
-    class="headline text-3xl sm:text-[5rem] sm:leading-[6rem] max-w-7xl text-center font-bold bg-clip-text block py-4"
+    class="headline px-4 text-4xl font-black sm:text-[5rem] sm:leading-[6rem] max-w-7xl text-center sm:font-bold bg-clip-text block py-4"
   >
     Libraries and Frameworks used in this project
   </span>
@@ -19,6 +19,7 @@
       [ngStyle]="{ perspective: perspective + 'px' }"
     >
       <a
+        [routerLink]="(small$ | async) ? null : card.link"
         href="{{ card.link }}"
         target="_blank"
         class="card group grid place-items-center relative rounded-xl shadow-lg cursor-pointer"

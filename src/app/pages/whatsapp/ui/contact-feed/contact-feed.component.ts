@@ -15,7 +15,8 @@ import { DarkmodeToggleComponent } from '@shared/ui/toogle/darkmode';
 import { ScreenSizeService } from '@core/services/screen-size';
 import { LogoComponent } from '@shared/ui/logo';
 import { WhatsappContactState } from '@whatsapp/store/contact/contact.state';
-
+import { RouterModule } from '@angular/router';
+import { ContactSkeletonComponent } from './skeleton/contact-skeleton.component';
 @Component({
   selector: 'app-contact-feed',
   standalone: true,
@@ -27,6 +28,8 @@ import { WhatsappContactState } from '@whatsapp/store/contact/contact.state';
     MatButtonModule,
     DarkmodeToggleComponent,
     LogoComponent,
+    RouterModule,
+    ContactSkeletonComponent,
   ],
   templateUrl: './contact-feed.component.html',
   styleUrls: ['./contact-feed.component.scss'],
@@ -40,15 +43,6 @@ export class ContactFeedComponent {
 
   @Select(WhatsappContactState.contacts())
   contacts$: Observable<WhatsappContact[]> | undefined;
-
-  // @Select(WhatsappState.syncLoading)
-  // syncLoading$: Observable<boolean> | undefined;
-
-  // @Select(WhatsappState.contacts)
-  // contacts2$: Observable<WhatsappContact[]> | undefined;
-
-  // @Select(({ whatsapp }: { whatsapp: WSM }) => whatsapp.selectedContact)
-  // selectedContact2$: Observable<WhatsappContact> | undefined;
 
   constructor(
     protected screenSizeService: ScreenSizeService,

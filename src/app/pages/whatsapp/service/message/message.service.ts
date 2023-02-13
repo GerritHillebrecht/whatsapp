@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { Apollo } from 'apollo-angular';
-import { map, Observable, take, tap } from 'rxjs';
-import { WhatsappMessage, WhatsappUser } from '@whatsapp/interface';
+import { map, take } from 'rxjs';
+import { WhatsappUser } from '@whatsapp/interface';
 import { MessageComposeService } from '../message-compose/message-compose.service';
 import { Store } from '@ngxs/store';
 import uniqid from 'uniqid';
@@ -11,7 +11,6 @@ import {
   MessageQueryResult,
   MessageQueryVariables,
   MESSAGE_QUERY,
-  SYNCHRONIZATION_QUERY,
   SyncQueryResult as syncResult,
   SyncQueryVariables as syncVars,
 } from '../synchronisation/sync.query';
@@ -28,11 +27,16 @@ import {
 } from './message.graphql';
 import { WhatsappContactState, WhatsappState } from '@whatsapp/store';
 import { ApolloCache } from '@apollo/client/core';
+import { CacheMessageQueryOptions } from '../subscription/read-status/read-update-subscription.service';
+import { QUERY_LIMIT } from '@whatsapp/tokens';
+import { StorageService } from '../storage';
+import { MessageHelperService } from './message-helper.service';
 
 interface OptimisticResponseVariables {
   uuid: string;
   body: string;
   sender: WhatsappUser;
+  image: string | null;
   receiver: WhatsappUser;
 }
 
@@ -40,13 +44,17 @@ interface OptimisticResponseVariables {
   providedIn: 'root',
 })
 export class MessageService {
+  limit = inject(QUERY_LIMIT);
+
   constructor(
     private apollo: Apollo,
+    private store: Store,
+    private storage: StorageService,
     private compose: MessageComposeService,
-    private store: Store
+    private helper: MessageHelperService
   ) {}
 
-  sendMessage(): Observable<WhatsappMessage> {
+  async sendMessage() {
     const [sender, receiver] = [
       this.store.selectSnapshot(WhatsappState.whatsappUser)!,
       this.store.selectSnapshot(WhatsappContactState.selectedContact)!,
@@ -54,21 +62,25 @@ export class MessageService {
 
     const uuid = uniqid();
     const body = this.compose.messageControl.value;
+    const image =
+      this.compose.imageControl.value && !sender.isBot
+        ? await this.storage.uploadImage(this.compose.imageControl.value, uuid)
+        : '';
 
     const variables: MessageCreateVariables = {
       uuid,
       body,
+      image,
       receiverId: receiver.id,
       senderId: sender.id,
     };
-
-    console.log('variables', variables);
 
     const optimisticResponse: MessageCreateResult =
       this.createOptimisticResponse({
         uuid,
         body,
         sender,
+        image,
         receiver,
       });
 
@@ -83,9 +95,9 @@ export class MessageService {
           const { id } = this.store.selectSnapshot(WhatsappState.whatsappUser)!;
           const { saveMessage: message } = data;
 
-          const cacheQueryOptions = {
+          const cacheQueryOptions: CacheMessageQueryOptions = {
             query: MESSAGE_QUERY,
-            variables: { id },
+            variables: { id, limit: this.limit },
           };
 
           cache.updateQuery<MessageQueryResult, MessageQueryVariables>(
@@ -104,55 +116,21 @@ export class MessageService {
               };
             }
           );
+          this.compose.messageForm.reset({ text: '', image: '' });
+          this.helper.showImageSelector$.next(false);
         },
       })
       .pipe(
-        tap(() => this.compose.messageControl.reset()),
         map((result: any) => result.data.sendMessage),
         take(1)
       );
-  }
-
-  private updateCache(cache: ApolloCache<any>, data: MessageCreateResult) {
-    // const { id } = this.store.selectSnapshot(WhatsappState.whatsappUser)!;
-    // const cacheQueryOptions = {
-    //   query: MESSAGE_QUERY,
-    //   variables: { id },
-    // };
-    // cache.updateQuery(cacheQueryOptions, (data: MessageQueryResult | null) => {
-    //   return {
-    //     __typename: 'Query',
-    //     ...data,
-    //   };
-    // });
-    // const cachedData = cache.readQuery<
-    //   MessageQueryResult,
-    //   MessageQueryVariables
-    // >({
-    //   query: MESSAGE_QUERY,
-    //   variables: { id: whatsappUser.id },
-    // });
-    // if (!cachedData) return;
-    // const { messages } = cachedData;
-    // const { saveMessage } = data;
-    // const message = {
-    //   ...saveMessage,
-    //   sender: whatsappUser,
-    //   receiver: this.store.snapshot().whatsapp.selectedContact,
-    // };
-    // cache.writeQuery({
-    //   query: MESSAGE_QUERY,
-    //   variables: { id: whatsappUser.id },
-    //   data: {
-    //     messages: [message, ...messages],
-    //   },
-    // });
   }
 
   private createOptimisticResponse({
     uuid,
     body,
     sender,
+    image,
     receiver,
   }: OptimisticResponseVariables): MessageCreateResult {
     return {
@@ -162,7 +140,7 @@ export class MessageService {
         id: 0,
         uuid: uuid,
         body,
-        image: '',
+        image,
         deliveryStatus: 'pending',
         sender: {
           __typename: 'User',

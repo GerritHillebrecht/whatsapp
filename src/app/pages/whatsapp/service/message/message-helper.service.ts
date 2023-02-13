@@ -4,8 +4,9 @@ import 'dayjs/locale/de';
 import dayjs from 'dayjs';
 import { Store } from '@ngxs/store';
 import { WhatsappMessage, WhatsappMessageQueryDto } from '@whatsapp/interface';
-import { WhatsappState } from '@whatsapp/store';
+import { WhatsappContactState, WhatsappState } from '@whatsapp/store';
 import { UpdateReadStatus } from '@whatsapp/store/whatsapp.actions';
+import { BehaviorSubject } from 'rxjs';
 dayjs.extend(relativeTime);
 dayjs.locale('de');
 
@@ -13,6 +14,8 @@ dayjs.locale('de');
   providedIn: 'root',
 })
 export class MessageHelperService {
+  showImageSelector$ = new BehaviorSubject<boolean>(false);
+
   constructor(private store: Store) {}
 
   mapToMsg(message: WhatsappMessageQueryDto): WhatsappMessage {
@@ -28,21 +31,24 @@ export class MessageHelperService {
   }
 
   markAsRead(messages: WhatsappMessage[]): void {
-    const { selectedContact } = this.store.selectSnapshot(WhatsappState);
-    if (!selectedContact) return;
-    const unreadMessages = messages.filter((message) => {
-      const { sender, receiver, deliveryStatus, isMine } = message;
-      return (
-        !isMine &&
-        deliveryStatus === 'delivered' &&
-        [sender.id, receiver.id].includes(selectedContact.id)
-      );
-    });
+    const selectedUserId = this.store.selectSnapshot(
+      WhatsappContactState.selectedContact
+    )?.id;
 
-    const messageIds = unreadMessages.map((message) => message.id);
+    if (!selectedUserId) return;
 
-    if (messageIds.length) {
-      this.store.dispatch(new UpdateReadStatus(messageIds));
+    const unreadMessageIds = messages
+      .filter(({ sender, deliveryStatus, isMine }) => {
+        return (
+          !isMine &&
+          sender.id === selectedUserId &&
+          deliveryStatus === 'delivered'
+        );
+      })
+      .map(({ id }) => id);
+
+    if (unreadMessageIds.length > 0) {
+      this.store.dispatch(new UpdateReadStatus(unreadMessageIds));
     }
   }
 

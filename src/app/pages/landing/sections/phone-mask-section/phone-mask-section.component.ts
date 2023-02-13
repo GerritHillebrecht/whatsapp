@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { Application } from '@splinetool/runtime';
 import { LogoComponent } from '@shared/ui/logo';
 import { RouterModule } from '@angular/router';
+import { ScreenSizeService } from '@core/services/screen-size';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-phone-mask-section',
@@ -13,6 +15,12 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./phone-mask-section.component.scss'],
 })
 export class PhoneMaskSectionComponent implements OnInit {
+  small$: Observable<boolean>;
+
+  constructor(private screenSize: ScreenSizeService) {
+    this.small$ = this.screenSize.twSm$;
+  }
+
   ngOnInit(): void {
     // const canvasRef = document.getElementById('canvas3d') as HTMLCanvasElement;
     // const app = new Application(canvasRef);

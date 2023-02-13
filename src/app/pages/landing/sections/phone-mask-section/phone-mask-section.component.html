@@ -1,9 +1,14 @@
-<section class="h-screen main-background-color px-8">
+<section class="h-[100dvh] main-background-color px-8 overflow-hidden">
   <div
-    class="radial-gradient max-w-7xl mx-auto h-full grid auto-rows-auto sm:grid-cols-12 gap-2 sm:grid-rows-[repeat(12,1fr)]"
+    class="max-w-7xl 3xl:max-w-[100rem] mx-auto h-full flex flex-col gap-6 justify-center sm:grid sm:grid-cols-12 sm:gap-2 sm:grid-rows-6"
+    [ngClass]="{
+      'radial-gradient': !(small$ | async)
+    }"
   >
+    <!-- Moving blurry circles -->
     <div
-      style="grid-area: 6 / 5 / 10 / -1"
+      *ngIf="!(small$ | async)"
+      style="grid-area: 4 / 5 / 5 / -1"
       class="moveInCircle relative grid place-items-center dark:opacity-50"
     >
       <div
@@ -16,45 +21,53 @@
         class="rounded-full w-56 aspect-square bg-cyan-400 blur-3xl absolute translate-y-24 mix-blend-multiply"
       ></div>
     </div>
-    <div
-      class="grid sm:grid-rows-2 sm:grid-cols-2 sm:gap-2 z-10 sm:col-span-4 sm:row-span-6 sm:col-start-1 sm:row-start-4"
+
+    <span
+      *ngIf="small$ | async"
+      class="text-5xl sm:stext-[6rem] sm:leading-none text-inherit font-black"
     >
-      <div
-        class="portrait portrait-1 rounded-tl-[3rem] rounded-br-[3rem]"
-      ></div>
+      WhatsApp
+    </span>
+
+    <!-- Image Square -->
+    <div
+      class="h-[45vh] sm:h-full relative grid grid-rows-2 grid-cols-2 gap-2 z-10 sm:col-span-4 sm:row-span-4 sm:col-start-1 sm:row-start-2"
+    >
+      <div class="portrait portrait-1 rounded-tl-[3rem]"></div>
       <div class="portrait portrait-2 rounded-tr-[3rem]"></div>
-      <div
-        class="portrait portrait-3 rounded-bl-[3rem] rounded-tr-[3rem]"
-      ></div>
+      <div class="portrait portrait-3 rounded-bl-[3rem]"></div>
       <div class="portrait portrait-4 rounded-br-[3rem]"></div>
-    </div>
-    <div class="row-span-2 col-span-2 row-start-6 col-start-2 z-40">
-      <div
-        class="bg-lime-500 mx-auto portrait:w-full landscape:h-full aspect-square rounded-full grid place-items-center border-[7px] border-solid border-stone-100 dark:border-stone-900 z-10 shadow-xl"
-      >
+
+      <!-- Whatsapp Icon -->
+      <div class="absolute inset-0 grid place-items-center">
         <div
-          class="w-[calc(100%_-_8px)] aspect-square border-[7px] border-solid border-stone-100 dark:border-stone-900 bg-lime-500 text-stone-100 rounded-full grid place-content-center"
+          class="bg-lime-500 mx-auto portrait:w-2/5 landscape:h-[35%] portrait:max-w-48 relative landscape:max-h-48 aspect-square rounded-full grid place-items-center border-[7px] border-solid border-stone-100 dark:border-stone-900 z-10 shadow-xl"
         >
-          <app-logo size="3x" [showIcon]="true" [showText]="false"></app-logo>
+          <div
+            class="portrait:w-[calc(100%_-_8px)] landscape:h-[calc(100%_-_8px)] aspect-square border-[7px] border-solid border-stone-100 dark:border-stone-900 bg-lime-500 text-stone-100 rounded-full grid place-content-center"
+          >
+            <app-logo
+              [size]="(small$ | async) ? '3x' : '4x'"
+              [showIcon]="true"
+              [showText]="false"
+            ></app-logo>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Text  -->
     <div
-      class="flex items-center justify-center relative mix-blend-soft-light"
-      style="grid-area: 7 / 6 / 12 / -1; grid-area: 1 / 6 / -1 / -1"
+      class="relative flex flex-col items-start sm:justify-center gap-4"
+      style="grid-area: 2 / 6 / 6 / -1"
     >
-      <div class="relative w-full aspect-video opacity-70">
-        <canvas #canvas id="canvas3d"></canvas>
-      </div>
-    </div>
-    <div
-      class="relative flex flex-col items-start gap-4"
-      style="grid-area: 4 / 6 / 10 / -1"
-    >
-      <span class="text-[6rem] leading-none text-inherit font-black">
+      <span
+        *ngIf="!(small$ | async)"
+        class="text-5xl sm:stext-[6rem] sm:leading-none text-inherit font-black"
+      >
         WhatsApp
       </span>
-      <span class="text-lg text-inherit">
+      <span class="text-md sm:text-lg text-inherit">
         WhatsApp ist eine einfache, kostenlose und zuverlässige
         Kommunikationsplattform, die Benutzern die Möglichkeit bietet, Texte,
         Sprach- und Videoanrufe, sowie das Teilen von Medien und Dokumenten mit

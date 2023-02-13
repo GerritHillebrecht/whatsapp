@@ -1,22 +1,31 @@
 <aside
-  class="relative h-full z-20 bg-white dark:bg-stone-800 shadow-lg grid grid-rows-[max-content,_auto]"
+  class="relative max-h-screen h-full z-20 bg-white sm:bg-stone-50 dark:bg-stone-800 shadow-lg grid grid-rows-[max-content,_auto] sm:rounded-tl-2xl sm:border-[1px] sm:border-solid sm:border-stone-200 sm:dark:border-stone-900"
 >
   <div
     class="loading-animation absolute h-1 w-full bg-rose-400 top-0 left-0 rounded-lg"
     *ngIf="syncLoading$ | async"
   ></div>
   <!-- Header Part with Title & Search-Bar -->
-  <header class="flex flex-col gap-2 pt-8 px-6 -mb-5">
+  <header class="flex flex-col gap-4 pt-8 px-6 -mb-5">
     <!-- Header part -->
     <nav class="flex flex-row justify-between items-center">
       <!-- Headline -->
-      <span class="font-semibold inter text-xl">Chats</span>
+      <div class="flex flex-row gap-2 items-center">
+        <button
+          mat-icon-button
+          routerLink="/"
+          *ngIf="screenSizeService.twSm$ | async"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="font-semibold inter text-xl">Chats</span>
+      </div>
 
       <!-- Buttons -->
       <div class="flex flex-row gap-2">
-        <button mat-icon-button>
+        <!-- <button mat-icon-button>
           <mat-icon>add_box</mat-icon>
-        </button>
+        </button> -->
         <app-darkmode-toggle
           size="1.5rem"
           *ngIf="screenSizeService.twSm$ | async"
@@ -31,40 +40,22 @@
 
   <!-- Contacts iteration -->
   <div
-    *ngIf="contacts$ | async as contacts"
-    class="flex flex-col px-2 py-4 gap-3 overflow-y-auto scrollbar-custom"
+    class="flex flex-col px-2 py-4 gap-3 overflow-y-auto scrollbar-custom skeleton"
   >
     <!-- Contact iterator -->
-    <app-contact
-      *ngFor="
-        let contact of contacts;
-        trackBy: trackByContactFn;
-        let index = index
-      "
-      class="slideInDown"
-      [ngStyle]="{ 'animation-delay': index * 59 + 'ms' }"
-      [contact]="contact"
-      [active]="contact.id === (selectedContact$ | async)?.id"
-    ></app-contact>
 
-    <!-- Helper Message for new Users -->
-    <ng-container *ngIf="contacts.length <= 1">
-      <div class="h-full flex flex-col items-center pt-12">
-        <div
-          class="flex flex-col gap-2 max-w-[70%] w-full text-xl inter text-center items-center"
-        >
-          <app-logo [showText]="false" size="3x"></app-logo>
-          <span> Du hast noch keinen Chat? </span>
-          <strong>Kein Problem.</strong>
-          <span>
-            Durchsuche einfach über die Suchleiste deine Kontakte oder füge
-            einen neuen Kontakt hinzu.
-          </span>
-          <span class="italic text-sm">
-            Der OPEN AI Bot steht dir immer zur Verfügung.
-          </span>
-        </div>
-      </div>
+    <ng-container *ngIf="contacts$ | async as contacts">
+      <app-contact
+        *ngFor="
+          let contact of contacts;
+          trackBy: trackByContactFn;
+          let index = index
+        "
+        class="slideInDown"
+        [ngStyle]="{ 'animation-delay': index * 59 + 'ms' }"
+        [contact]="contact"
+        [active]="contact.id === (selectedContact$ | async)?.id"
+      ></app-contact>
     </ng-container>
   </div>
 </aside>

@@ -1,10 +1,9 @@
-<ng-container *ngIf="whatsappUser$ | async as user">
+<ng-container *ngIf="firebaseUser$ | async as user">
   <app-avatar
     #trigger
     cursor="pointer"
     [mat-menu-trigger-for]="menu"
-    [imageSrc]="user.image || ''"
-    [initials]="user.firstName[0] + user.lastName[0]"
+    [imageSrc]="user.photoURL || 'assets/images/missing-user-image.png'"
     matTooltip="Einstellungen"
   ></app-avatar>
   <mat-menu
@@ -14,8 +13,7 @@
   >
     <div class="flex flex-col p-4">
       <span>
-        {{ user.firstName }}
-        {{ user.lastName }}
+        {{ user.displayName || "No DisplayName specified" }}
       </span>
       <span class="italic text-xs">{{ user.email }}</span>
     </div>
@@ -24,9 +22,9 @@
       <div
         class="flex flex-row gap-4 items-center text-stone-800 dark:text-stone-100"
       >
-        <mat-icon class="text-[inherit!important] mr-[0!important]"
-          >logout</mat-icon
-        >
+        <mat-icon class="text-[inherit!important] mr-[0!important]">
+          logout
+        </mat-icon>
         <span>Abmelden</span>
       </div>
     </button>

@@ -31,7 +31,7 @@ export class MessageFeedComponent implements AfterViewInit {
   @ViewChild('messageContainer')
   messageContainer: ElementRef<HTMLDivElement> | undefined;
 
-  @Select(WhatsappMessageState.messages(100))
+  @Select(WhatsappMessageState.messages())
   messages$: Observable<WhatsappMessage[] | null> | undefined;
 
   constructor(protected screenSizeService: ScreenSizeService) {}

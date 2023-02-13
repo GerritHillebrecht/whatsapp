@@ -1,25 +1,23 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   AuthenticationState,
   AuthenticationState as AuthState,
 } from '@auth/store';
 
 import { Store } from '@ngxs/store';
+import { WhatsappMessage, WhatsappMessageQueryDto } from '@whatsapp/interface';
 import {
-  WhatsappContact,
-  WhatsappMessage,
-  WhatsappMessageQueryDto,
-} from '@whatsapp/interface';
-import {
-  MessageQueryResult,
+  MessageQueryResult as MQR,
+  MessageQueryVariables as MQV,
   MESSAGE_QUERY,
   SyncQueryResult as SyncResult,
   SyncQueryVariables as SyncVars,
 } from '@whatsapp/service/synchronisation/sync.query';
-import { WhatsappState, WhatsappStateModel as WSM } from '@whatsapp/store';
+import { QUERY_LIMIT } from '@whatsapp/tokens';
 import { Apollo } from 'apollo-angular';
 import { filter, map, Observable, skip, takeUntil, tap } from 'rxjs';
 import { MessageHelperService } from '../../message/message-helper.service';
+import { CacheMessageQueryOptions } from '../read-status/read-update-subscription.service';
 import {
   MESSAGE_SUBSCRIPTION,
   SubQueryResult,
@@ -30,6 +28,7 @@ import {
   providedIn: 'root',
 })
 export class MessageSubscriptionService {
+  limit = inject(QUERY_LIMIT);
   mapDtoToMessage: (dto: WhatsappMessageQueryDto) => WhatsappMessage;
 
   constructor(
@@ -50,12 +49,6 @@ export class MessageSubscriptionService {
       .select(AuthenticationState.firebaseUser)
       .pipe(skip(1));
 
-    console.log(
-      '%c message update subscription',
-      'font-size: 40px; font-weight: bold',
-      { id }
-    );
-
     return this.apollo
       .subscribe<SubQueryResult, SubQueryVariables>(subQueryOptions)
       .pipe(
@@ -67,14 +60,14 @@ export class MessageSubscriptionService {
         map(({ data }) => data!.messageSubscription),
         map((dto) => this.mapDtoToMessage(dto)),
         tap((message) => {
-          const cacheQueryOptions = {
+          const cacheQueryOptions: CacheMessageQueryOptions = {
             query: MESSAGE_QUERY,
-            variables: { id },
+            variables: { id, limit: this.limit },
           };
 
-          this.apollo.client.cache.updateQuery(
+          this.apollo.client.cache.updateQuery<MQR, MQV>(
             cacheQueryOptions,
-            (data: MessageQueryResult | null) => {
+            (data: MQR | null) => {
               if (!data) return;
               if (data.messages.some((m) => m.uuid === message.uuid)) return;
 

@@ -1,8 +1,5 @@
 <!-- Wrapper -->
-<div
-  #wrapper
-  class="h-screen grid grid-rows-[max-content,_auto,_max-content]"
->
+<div #wrapper class="h-[100dvh] sm:h-screen grid grid-rows-[max-content,_auto,_max-content]">
   <!-- Contact Info Bar -->
   <app-contact-info-bar></app-contact-info-bar>
 
@@ -21,7 +18,12 @@
         <ng-container *ngIf="messages$ | async as messages; else selectContact">
           <app-message
             [message]="message"
-            *ngFor="let message of messages; trackBy: trackByMessageFn"
+            [index]="index"
+            *ngFor="
+              let message of messages;
+              let index = index;
+              trackBy: trackByMessageFn
+            "
           ></app-message>
         </ng-container>
       </div>
@@ -29,7 +31,9 @@
   </div>
 
   <!-- Message Composer -->
-  <app-message-composer></app-message-composer>
+  <div class="relative">
+    <app-message-composer></app-message-composer>
+  </div>
 </div>
 
 <ng-template #selectContact>

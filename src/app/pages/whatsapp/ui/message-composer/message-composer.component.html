@@ -1,13 +1,30 @@
 <form
   [formGroup]="compose.messageForm"
   (submit)="sendMessage()"
-  class="grid grid-cols-[max-content,_auto,_max-content] gap-2 px-2 py-1 items-center border-t-2 border-solid border-stone-200 dark:border-stone-800"
+  class="grid sm:bg-stone-50 dark:bg-stone-800 z-[60] grid-cols-[max-content,_max-content,_auto,_max-content] px-2 py-1 items-center border-t-[1px] border-solid border-t-stone-200 dark:border-t-stone-900"
 >
   <!-- Emoji-Button -->
   <app-emoji-selector
     [inputComponent]="textArea"
     [control]="compose.messageControl"
   ></app-emoji-selector>
+
+  <!-- Image Selector Button -->
+  <button
+    mat-icon-button
+    class="mr-2"
+    (click)="toggleImageSelector()"
+    type="button"
+    [disabled]="(selectedContact$ | async)?.isBot || false"
+  >
+    <mat-icon
+      class="material-icons-outlined"
+      [ngClass]="{
+        'material-icons-outlined': !(helper.showImageSelector$ | async)
+      }"
+      >image</mat-icon
+    >
+  </button>
 
   <!-- Text-Area -->
   <app-textarea
@@ -20,9 +37,12 @@
   <button
     mat-icon-button
     type="submit"
-    (click)="sendMessage()"
-    [disabled]="compose.messageForm.invalid"
+    [disabled]="compose.messageControl.invalid && compose.imageControl.invalid"
   >
     <mat-icon>send</mat-icon>
   </button>
 </form>
+<app-image-selector
+  [messageForm]="compose.messageForm"
+  *ngIf="helper.showImageSelector$ | async"
+></app-image-selector>

@@ -1,14 +1,36 @@
 <div
-  #messageRef
   *ngIf="message"
   class="slide-in flex flex-col max-w-[60%] w-[max-content] min-w-[15%] rounded-lg shadow-md p-2 text-stone-700 dark:text-stone-300"
+  [ngStyle]="{
+    'animation-delay': index * 40 + 'ms'
+  }"
   [ngClass]="{
-    'ml-auto rounded-br-sm bg-[hsl(111,88%,91%)] dark:bg-[hsl(169,96%,18%)]':
+    'own-message ml-auto rounded-br-sm bg-[hsl(111,88%,91%)] dark:bg-[hsl(169,96%,18%)]':
       (user$ | async)?.id === message.sender.id,
     'mr-auto rounded-bl-sm bg-[hsl(0,0%,98%)] dark:bg-[hsl(0,0%,22%)]':
-      (user$ | async)?.id === message.receiver.id
+      (user$ | async)?.id === message.receiver.id,
+    'w-[300px]': message.image
   }"
 >
+  <picture
+    *ngIf="imageSrc"
+    class="mb-2 cursor-pointer w-[300px] max-w-[100%] rounded-md border-2 border-[hsl(111,87%,86%)] dark:border-stone-800 border-solid shadow-xl"
+  >
+    <ng-container
+      *ngFor="let source of imageSrc | slice : 0 : imageSrc.length - 1"
+    >
+      <source
+        *ngIf="source.filename"
+        [srcset]="source.filename"
+        [type]="'image/' + source.type"
+      />
+    </ng-container>
+    <img
+      [src]="imageFallbackSrc"
+      [alt]="message.body"
+      class="w-full h-full object-cover rounded-md"
+    />
+  </picture>
   <span class="text-sm">{{ message.body }}</span>
   <div
     class="flex flex-row text-[0.65rem] leading-none gap-1 text-right justify-end items-center"

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { State, Action, StateContext, NgxsOnInit } from '@ngxs/store';
 import { startWith } from 'rxjs';
 import { fromEvent } from 'rxjs';
-import { SetMode, SetTheme } from './theme.actions';
+import { SetMode, SetTheme, UpdateThemeColor } from './theme.actions';
 
 export interface ThemeStateModel {
   colorScheme: 'light' | 'dark';
@@ -36,7 +36,7 @@ export class ThemeState implements NgxsOnInit {
 
   @Action(SetTheme)
   setTheme(
-    { patchState }: StateContext<ThemeStateModel>,
+    { patchState, dispatch }: StateContext<ThemeStateModel>,
     { colorScheme }: SetTheme
   ) {
     patchState({ colorScheme, mode: colorScheme });
@@ -48,5 +48,14 @@ export class ThemeState implements NgxsOnInit {
   @Action(SetMode)
   setMode({ patchState }: StateContext<ThemeStateModel>, { mode }: SetMode) {
     patchState({ mode });
+  }
+
+  @Action(UpdateThemeColor)
+  updateThemeColor(
+    { patchState }: StateContext<ThemeStateModel>,
+    { color }: UpdateThemeColor
+  ) {
+    const themeColorSelector = document.querySelector('meta[name=theme-color]');
+    themeColorSelector?.setAttribute('content', color);
   }
 }

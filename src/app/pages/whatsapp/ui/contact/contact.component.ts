@@ -7,11 +7,12 @@ import { ScreenSizeService } from '@core/services/screen-size';
 import { Router, RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { SelectWhatsappContact } from '@whatsapp/store/contact/contact.actions';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, AvatarComponent, RouterModule],
+  imports: [CommonModule, AvatarComponent, RouterModule, MatIconModule],
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.scss'],
 })

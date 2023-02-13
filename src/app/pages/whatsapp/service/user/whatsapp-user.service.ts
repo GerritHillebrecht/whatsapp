@@ -54,9 +54,6 @@ export class WhatsappUserService {
     return this.store.select(WhatsappState.whatsappUser).pipe(
       distinctUntilChanged((a, b) => a?.id === b?.id),
       filter((whatsappUser) => Boolean(whatsappUser)),
-      takeUntil(
-        this.store.select(AuthenticationState.firebaseUser).pipe(skip(1))
-      ),
       map((whatsappUser) => whatsappUser as WhatsappUser),
       map(({ id }) => id)
     );

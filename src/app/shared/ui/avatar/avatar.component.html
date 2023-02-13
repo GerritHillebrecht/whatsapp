@@ -5,6 +5,7 @@
 >
   <ng-container *ngIf="imageSrc; else initialCircle">
     <img
+      *ngIf="imageSrc as AvatarImage; else picture"
       [src]="imageSrc"
       alt="Avatar Image"
       [height]="size"
@@ -12,6 +13,15 @@
       class="rounded-full object-cover"
       [ngStyle]="{ width: size + 'px', height: size + 'px' }"
     />
+    <ng-template #picture>
+      <picture>
+        <img
+          [src]="imageSrc"
+          alt="Avatar Image"
+          class="rounded-full object-cover"
+        />
+      </picture>
+    </ng-template>
   </ng-container>
   <ng-template #initialCircle>
     <div

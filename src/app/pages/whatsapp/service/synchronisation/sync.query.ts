@@ -1,6 +1,6 @@
 import { MessageFragment } from '@whatsapp/interface/whatsapp.message.interface';
 import { UserFragment } from '@whatsapp/interface/whatsapp.user.interface';
-import { gql } from 'apollo-angular';
+import { gql, TypedDocumentNode } from 'apollo-angular';
 import { WhatsappMessageQueryDto, WhatsappUser } from '../../interface';
 
 export const MARK_MESSAGES_AS_READ_MUTATION = gql`
@@ -66,12 +66,15 @@ export interface SubQueryVariables {
   id: number;
 }
 
-export const MESSAGE_QUERY = gql`
+export const MESSAGE_QUERY: TypedDocumentNode<
+  MessageQueryResult,
+  MessageQueryVariables
+> = gql`
   ${UserFragment}
   ${MessageFragment}
 
-  query Messages($id: Float!) {
-    messages(id: $id) {
+  query Messages($id: Float!, $limit: Int!) {
+    messages(id: $id, limit: $limit) {
       ...MessageFragment
       sender {
         ...UserFragment
@@ -90,6 +93,7 @@ export interface MessageQueryResult {
 
 export interface MessageQueryVariables {
   id: number;
+  limit: number;
 }
 
 export const CONTACT_QUERY = gql`

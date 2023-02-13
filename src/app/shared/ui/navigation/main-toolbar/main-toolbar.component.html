@@ -1,7 +1,14 @@
-<mat-toolbar class="bg-transparent max-w-7xl mx-auto" style="color: inherit">
+<mat-toolbar
+  class="bg-transparent max-w-7xl 3xl:max-w-[100rem] mx-auto px-[2rem!important]"
+  style="color: inherit"
+>
   <app-logo routerLink="/" class="cursor-pointer"></app-logo>
   <div class="ml-auto flex items-center gap-4">
-    <button mat-button routerLink="/whatsapp">
+    <button
+      mat-button
+      routerLink="/whatsapp"
+      *ngIf="!(screenSize.twSm$ | async)"
+    >
       <mat-icon class="relative top-[1px]">chat</mat-icon>
       Jetzt Chatten
     </button>

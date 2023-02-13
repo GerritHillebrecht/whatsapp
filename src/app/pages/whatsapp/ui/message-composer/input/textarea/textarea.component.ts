@@ -13,9 +13,9 @@ import {
   filter,
   fromEvent,
   Subject,
-  switchMap,
   takeUntil,
   Observable,
+  forkJoin,
 } from 'rxjs';
 import {
   FormControl,
@@ -23,11 +23,11 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
-import { MessageComposeService, MessageService } from '@whatsapp/service';
 import { WhatsappContact } from '@whatsapp/interface';
-import { WhatsappStateModel as WSM } from '@whatsapp/store';
+import { SendMessage, WhatsappStateModel as WSM } from '@whatsapp/store';
+import { ScreenSizeService } from '@core/services/screen-size';
 
 @Component({
   selector: 'app-textarea',
@@ -51,7 +51,7 @@ export class TextareaComponent implements OnDestroy, AfterViewInit {
 
   destroy$ = new Subject<void>();
 
-  constructor(private message: MessageService) {}
+  constructor(private store: Store, private screenSize: ScreenSizeService) {}
 
   ngAfterViewInit(): void {
     const { nativeElement } = this.elementRef!;
@@ -65,7 +65,10 @@ export class TextareaComponent implements OnDestroy, AfterViewInit {
     }
 
     // Focus Chat Input after selecting a contact
-    this.selectedContact$?.subscribe(() => nativeElement.focus());
+    forkJoin({
+      selectedContact: this.selectedContact$!,
+      small: this.screenSize.twSm$,
+    }).subscribe((res) => (res.small ? nativeElement.focus() : null));
   }
 
   ngOnDestroy(): void {
@@ -104,10 +107,17 @@ export class TextareaComponent implements OnDestroy, AfterViewInit {
         takeUntil(this.destroy$),
         debounceTime(100),
         distinctUntilChanged(),
-        filter((input) => input.key === 'Enter' && input.ctrlKey && form.valid),
-        switchMap(() => this.message.sendMessage())
+        filter(
+          (input) =>
+            input.key === 'Enter' &&
+            input.ctrlKey &&
+            (form.get('text')!.valid || form.get('image')!.valid)
+        )
       )
       .subscribe({
+        next: async (res) => {
+          this.store.dispatch(new SendMessage());
+        },
         error: (err) => {
           console.error(err);
         },

@@ -1,16 +1,17 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AuthenticationState } from '@auth/store';
 import { NotificationService } from '@core/services/notification';
 import { Store } from '@ngxs/store';
-import { WhatsappContactState } from '@whatsapp/store';
-import { UpdateReadStatus } from '@whatsapp/store/message/message.actions';
+import { QUERY_LIMIT } from '@whatsapp/tokens';
 import { Apollo } from 'apollo-angular';
 import {
   catchError,
   delay,
+  from,
   Observable,
   retryWhen,
   skip,
+  switchMap,
   take,
   takeUntil,
   tap,
@@ -41,6 +42,7 @@ export interface MessageMap {
 })
 export class SynchronisationService {
   private retryCount = 1;
+  private limit = inject(QUERY_LIMIT);
 
   private takeUntilCondition = this.store
     .select(AuthenticationState.firebaseUser)
@@ -61,19 +63,21 @@ export class SynchronisationService {
     private notification: NotificationService
   ) {}
 
-  fetchMessages(whatsAppUserId: number): Observable<WhatsappMessage[]> {
+  fetchMessages(
+    whatsAppUserId: number,
+    offset = 0
+  ): Observable<WhatsappMessage[]> {
     return this.apollo
       .watchQuery<MessageQueryResult, MessageQueryVariables>({
         query: MESSAGE_QUERY,
-        variables: { id: whatsAppUserId },
+        variables: { id: whatsAppUserId, limit: this.limit },
       })
       .valueChanges.pipe(
         takeUntil(this.takeUntilCondition),
         catchError(this.errorHandler),
         retryWhen(this.retryWhenCondition),
         map(({ data }) => data.messages || []),
-        map((messages) => messages.map((msg) => this.support.mapToMsg(msg))),
-        tap((messages) => this.markAsRead(messages))
+        map((messages) => messages.map((msg) => this.support.mapToMsg(msg)))
       );
   }
 
@@ -90,28 +94,12 @@ export class SynchronisationService {
         map(({ data }) => data.contacts || [])
       );
   }
-
-  private markAsRead(messages: WhatsappMessage[]): void {
-    const selectedUserId = this.store.selectSnapshot(
-      WhatsappContactState.selectedContact
-    )?.id;
-
-    if (!selectedUserId) return;
-
-    const unreadMessageIds = messages
-      .filter(({ sender, deliveryStatus, isMine }) => {
-        return (
-          !isMine &&
-          sender.id === selectedUserId &&
-          deliveryStatus === 'delivered'
-        );
-      })
-      .map(({ id }) => id);
-
-    console.log('unreadMessageIds', unreadMessageIds);
-
-    if (unreadMessageIds.length > 0) {
-      this.store.dispatch(new UpdateReadStatus(unreadMessageIds));
-    }
-  }
+}
+function switchMmap(
+  arg0: (messages: any) => any
+): import('rxjs').OperatorFunction<
+  import('../../interface').WhatsappMessageQueryDto[],
+  WhatsappMessage[]
+> {
+  throw new Error('Function not implemented.');
 }

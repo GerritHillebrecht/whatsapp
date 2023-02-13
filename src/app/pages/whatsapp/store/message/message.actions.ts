@@ -26,7 +26,6 @@ export class UpdateReadStatus {
 
 export class SendMessage {
   static readonly type = '[Whatsapp Message] Send message';
-  constructor(public message: WhatsappMessageQueryDto) {}
 }
 
 export class SubscribeToMessages {
